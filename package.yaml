@@ -1,0 +1,44 @@
+name: the-hask-runner
+version: '0.1.0'
+github: Akvinikym/the-hask-runner
+license: Apache-2.0
+category: Game
+synopsis: An infinite runner
+description: An infinite runner
+maintainer: Pavel, Oleg, Nikita, Yuri
+copyright: 2018 PONY
+data-files: []
+
+extra-source-files:
+- package.yaml
+- README.md
+- stack.yaml
+
+ghc-options: -Wall -fno-warn-type-defaults
+
+dependencies:
+- base >= 4.7 && < 5
+
+default-extensions:
+- DuplicateRecordFields
+- FlexibleContexts
+- FlexibleInstances
+- GeneralizedNewtypeDeriving
+- LambdaCase
+- NamedFieldPuns
+- ScopedTypeVariables
+- OverloadedStrings
+
+library:
+  source-dirs: game
+
+executables:
+  the-hask-runner:
+    dependencies:
+    - the-hask-runner
+    ghc-options:
+    - -rtsopts
+    - -threaded
+    - -with-rtsopts=-N
+    main: Main.hs
+    source-dirs: executable

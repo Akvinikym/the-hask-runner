@@ -1,0 +1,51 @@
+-- This file has been generated from package.yaml by hpack version 0.28.2.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: db894211d8fb8510081c7a174052da90f985b5f08bcd39b299193b64c29086a3
+
+name:           the-hask-runner
+version:        0.1.0
+synopsis:       An infinite runner
+description:    An infinite runner
+category:       Game
+homepage:       https://github.com/Akvinikym/the-hask-runner#readme
+bug-reports:    https://github.com/Akvinikym/the-hask-runner/issues
+maintainer:     Pavel, Oleg, Nikita, Yuri
+copyright:      2018 PONY
+license:        Apache-2.0
+license-file:   LICENSE
+build-type:     Simple
+cabal-version:  >= 1.10
+extra-source-files:
+    package.yaml
+    README.md
+    stack.yaml
+
+source-repository head
+  type: git
+  location: https://github.com/Akvinikym/the-hask-runner
+
+library
+  other-modules:
+      Paths_the_hask_runner
+  hs-source-dirs:
+      game
+  default-extensions: DuplicateRecordFields FlexibleContexts FlexibleInstances GeneralizedNewtypeDeriving LambdaCase NamedFieldPuns ScopedTypeVariables OverloadedStrings
+  ghc-options: -Wall -fno-warn-type-defaults
+  build-depends:
+      base >=4.7 && <5
+  default-language: Haskell2010
+
+executable the-hask-runner
+  main-is: Main.hs
+  other-modules:
+      Paths_the_hask_runner
+  hs-source-dirs:
+      executable
+  default-extensions: DuplicateRecordFields FlexibleContexts FlexibleInstances GeneralizedNewtypeDeriving LambdaCase NamedFieldPuns ScopedTypeVariables OverloadedStrings
+  ghc-options: -Wall -fno-warn-type-defaults -rtsopts -threaded -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , the-hask-runner
+  default-language: Haskell2010
