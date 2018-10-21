@@ -1,4 +1,6 @@
 module Main where
 
+import qualified HaskRunner
+
 main :: IO ()
-main = putStr "Hello, World!"
+main = HaskRunner.main

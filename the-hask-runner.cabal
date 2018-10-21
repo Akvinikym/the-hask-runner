@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: db894211d8fb8510081c7a174052da90f985b5f08bcd39b299193b64c29086a3
+-- hash: c1f68d048dd4bb1c2299fb237eaaee0526a0c08904d0e6a4005d3164effdbd55
 
 name:           the-hask-runner
 version:        0.1.0
@@ -27,6 +27,8 @@ source-repository head
   location: https://github.com/Akvinikym/the-hask-runner
 
 library
+  exposed-modules:
+      HaskRunner
   other-modules:
       Paths_the_hask_runner
   hs-source-dirs:
@@ -34,7 +36,25 @@ library
   default-extensions: DuplicateRecordFields FlexibleContexts FlexibleInstances GeneralizedNewtypeDeriving LambdaCase NamedFieldPuns ScopedTypeVariables OverloadedStrings
   ghc-options: -Wall -fno-warn-type-defaults
   build-depends:
-      base >=4.7 && <5
+      StateVar
+    , aeson
+    , animate
+    , base >=4.7 && <5
+    , bytestring
+    , containers
+    , key-state
+    , lens
+    , linear
+    , mtl
+    , random
+    , safe
+    , safe-exceptions
+    , sdl2
+    , sdl2-image
+    , sdl2-mixer
+    , sdl2-ttf
+    , text
+    , text-conversions
   default-language: Haskell2010
 
 executable the-hask-runner
@@ -46,6 +66,24 @@ executable the-hask-runner
   default-extensions: DuplicateRecordFields FlexibleContexts FlexibleInstances GeneralizedNewtypeDeriving LambdaCase NamedFieldPuns ScopedTypeVariables OverloadedStrings
   ghc-options: -Wall -fno-warn-type-defaults -rtsopts -threaded -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      StateVar
+    , aeson
+    , animate
+    , base >=4.7 && <5
+    , bytestring
+    , containers
+    , key-state
+    , lens
+    , linear
+    , mtl
+    , random
+    , safe
+    , safe-exceptions
+    , sdl2
+    , sdl2-image
+    , sdl2-mixer
+    , sdl2-ttf
+    , text
+    , text-conversions
     , the-hask-runner
   default-language: Haskell2010
