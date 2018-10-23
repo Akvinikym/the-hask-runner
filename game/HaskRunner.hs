@@ -3,6 +3,7 @@ module HaskRunner
     ) where 
 
 import SDL
+import SDL.Image
 import Control.Monad (unless)
 
 main :: IO ()
