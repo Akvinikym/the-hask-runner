@@ -4,15 +4,19 @@ import HaskRunner.Core
 
 type Seed = Double
 
--- generate objects based on some random seed
-mapGenerator :: Seed -> [GameObject]
-mapGenerator _ = []
+{-|
+Generate infinite list if objects from random seed
+Example use in drawing: 
+    drawGame :: Game -> Picture
+    drawGame = drawGates . gameGates
+-}
+objectGenerator :: Seed -> [GameObject]
+objectGenerator _ = []
 
--- object, representing generated elements of the game
+-- Element of the game
 data GameObject = GameObject 
     { bounds       :: Bounds
     , objectType   :: ObjectType
     } 
 
--- type of what can be generated
 data ObjectType = Wall | Spikes | Coin
