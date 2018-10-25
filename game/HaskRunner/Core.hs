@@ -7,8 +7,10 @@ data Level = Level
     { player        :: Player     -- ^ player of the game
     , map           :: Map        -- ^ collection of current game objects
     , isFinished    :: Bool       -- ^ collision with obstacle occured
-    , gravityVector :: Bool       -- ^ true, if gravity is upside-down
-    , velocity      :: Velocity   -- ^ current player's (or world's) velocity
+    , gravityIsDown :: Bool       -- ^ true, if gravity is upside-down
+    , horVelocity   :: Velocity   -- ^ current player's (or world's) 
+                                  --   horizontal velocity
+    , vertVelocity  :: Velocity   -- ^ current player's vertical velocity
     , distance      :: Distance   -- ^ distance player travelled so far
     , lilcoins      :: Int        -- ^ number of coins player collected
     }
@@ -23,6 +25,15 @@ data Bounds = Bounds
     , bottomRight :: Point
     , bottomLeft  :: Point
     } deriving (Show)
+
+-- move the bounds to some direction: for example,
+-- (-1, -1) will move the bounds left-bottom to 1 point
+-- (1, 1)   will move the bounds right-up to 1 point
+moveBounds :: Bounds -> (Double, Double) -> Bounds
+moveBounds 
+    (Bounds (Point x1 y1) (Point x2 y2) (Point x3 y3) (Point x4 y4)) (x, y)
+    = Bounds (Point (x1 + x) (y1 + y)) (Point (x2 + x) (y2 + y))
+      (Point (x3 + x) (y3 + y)) (Point (x4 + x) (y4 + y))
 
 data Point = Point Double Double 
     deriving (Show)
