@@ -4,11 +4,13 @@ import HaskRunner.Core
 
 -- | Player's objects supply functions
 
--- move the player up or down if he is not staying on platforms
-movePlayer :: Level -> Level
-movePlayer level = level { player = Player newBounds }
+-- compute players location according to its velocity
+newPlayer :: Player -> Player
+newPlayer (Player bounds hor vert) = Player newBounds hor vert
   where
-    Level (Player bounds) _ _ gravityIsDown _ vertVelocity _ _ = level
-    newBounds
-        | gravityIsDown = moveBounds bounds (0, -1 * vertVelocity)
-        | otherwise     = moveBounds bounds (0, vertVelocity)
+    newBounds = moveBounds bounds (hor, vert)
+
+-- move the player according to his velocity and gravity
+movePlayer :: Level -> Level
+movePlayer level
+  = level { player = (newPlayer (player level))}
