@@ -3,20 +3,20 @@
 ## OSX build
 
 ```
-brew install sdl2
-brew install sdl2_ttf
-brew install sdl2_image
-brew install libmikmod
-brew install sdl2_mixer
 stack build
 ```
 
 ## Run
 
-For some reason, on MacOS it is impossible to run the game from `stack repl` - it will crash. So, only the method below will work.
-
 ```
 stack exec the-hask-runner
+```
+
+OR
+
+```
+stack repl
+main
 ```
 
 Haskell Style Guide

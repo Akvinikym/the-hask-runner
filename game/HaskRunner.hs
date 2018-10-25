@@ -2,30 +2,50 @@ module HaskRunner
     ( main
     ) where 
 
-import SDL
-import Control.Monad (unless)
+import CodeWorld
+import HaskRunner.Core
+import HaskRunner.Graphics.Drawers
+import HaskRunner.ObjectsHandlers.PlayerHandler
 
 main :: IO ()
-main = do
-    initializeAll
-    window <- createWindow "The Hask Runner" defaultWindow {
-        windowInitialSize = V2 1280 720
-    }
-    renderer <- createRenderer window (-1) defaultRenderer
-    appLoop renderer
+main = interactionOf initialWorld timingWorld eventsWorld drawWorld
 
--- | Main game loop
-appLoop :: Renderer -> IO ()
-appLoop renderer = do
-    events <- pollEvents
-    let eventIsQPress event =
-          case eventPayload event of
-            KeyboardEvent keyboardEvent ->
-                keyboardEventKeyMotion keyboardEvent == Pressed &&
-                keysymKeycode (keyboardEventKeysym keyboardEvent) == KeycodeQ
-            _ -> False
-        qPressed = any eventIsQPress events
-    rendererDrawColor renderer $= V4 0 0 255 255
-    clear renderer
-    present renderer
-    unless qPressed (appLoop renderer)
+initialWorld :: Level
+initialWorld = Level initialPlayer exampleInitialObjects False True 0 1 0 0
+  where
+    initialPlayer = Player (Bounds
+        (Point (-1) 1) 
+        (Point 1 1) 
+        (Point 1 (-1)) 
+        (Point (-1) (-1)))
+
+    exampleInitialObjects = [
+        GameObject (Bounds 
+            (Point (-5) (-4)) 
+            (Point 5 (-4)) 
+            (Point 5 (-6)) 
+            (Point (-5) (-6))) Platform,
+        GameObject (Bounds
+            (Point 9 1) 
+            (Point 11 1) 
+            (Point 11 (-4)) 
+            (Point 9 (-4))) Wall,
+        GameObject (Bounds
+            (Point (-1) (0)) 
+            (Point 1 (0)) 
+            (Point 1 (-2)) 
+            (Point (-1) (-2))) Spikes,
+        GameObject (Bounds 
+            (Point (-1) 1) 
+            (Point 1 1) 
+            (Point 1 (-1)) 
+            (Point (-1) (-1))) Coin]
+
+timingWorld :: Double -> Level -> Level
+timingWorld _ level = movePlayer level
+
+eventsWorld :: Event -> Level -> Level
+eventsWorld _ level = level
+
+drawWorld :: Level -> Picture
+drawWorld = drawLevel
