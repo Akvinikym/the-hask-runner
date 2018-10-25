@@ -18,24 +18,7 @@ ghc-options: -Wall -fno-warn-type-defaults
 
 dependencies:
     - base >=4.7 && <5
-    - aeson
-    - animate
-    - bytestring
-    - containers
-    - key-state
-    - linear
-    - lens
-    - mtl
-    - safe
-    - safe-exceptions
-    - sdl2
-    - sdl2-image
-    - sdl2-mixer
-    - sdl2-ttf
-    - StateVar
-    - text
-    - text-conversions
-    - random 
+    - codeworld-api
 
 default-extensions:
 - DuplicateRecordFields

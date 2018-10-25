@@ -5,11 +5,6 @@ import Data.Graph
 
 type Seed = Double
 
--- x0, x1, x2, x3
-type Pgram =  (Double, Double, Double, Double)
-
-PLAYER_SIZE = (Double, Double)
-
 {-|
 Generate infinite list if objects from random seed
 Example use in drawing: 
@@ -48,16 +43,16 @@ makeGraph walls = _
 
 -- Get zone, represented by 2 Pgrams, from every point of which player could
 -- reach the wall passed
-getInPaths :: Wall -> [Pgram]
+getInPaths :: Wall -> [Bounds]
 getInPaths w = _
 
 -- Get zone, represented by 2 Pgrams, which shows every point player could reach
 -- from this wall
-getOutPaths :: Wall -> [Pgram]
+getOutPaths :: Wall -> [Bounds]
 getOutpaths w = _
 
 -- Get intersection of two paralellograms
-intersectPgrams :: Pgram -> Pgram -> Pgram
+intersectBounds :: Bounds -> Bounds -> Bounds
 intersectPaths p p' = _
 
 -- Get player horizontal and vertical speed from distance passed
