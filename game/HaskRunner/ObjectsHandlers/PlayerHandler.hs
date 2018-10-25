@@ -15,9 +15,13 @@ collision position level (h, v) = (newHor, newVert)
       | otherwise = v
     horCollision = False
     vertCollision = any collides (map bounds (levelMap level))
-    y (Point c1 c2) = c2
+    y (Point _c1 c2) = c2
+    x (Point c1 _c2) = c1
     collides bound
       = y (bottomLeft position) <= y (topLeft bound) && y (bottomRight position) <= y (topRight bound)
+       &&
+       ((x (bottomLeft position) > x (topLeft bound) && x (bottomLeft position) < x (bottomRight bound))
+      || (x (bottomRight position) > x (topLeft bound) && x (bottomRight position) < x (bottomRight bound)))
 
 -- move the player according to his velocity and gravity
 movePlayer :: Level -> Level
