@@ -2,33 +2,40 @@ module HaskRunner.Core where
 
 -- | Contains general-purpose data types and functions
 
--- mainLoop :: Renderer -> IO ()
--- mainLoop renderer = do
-    -- acceptInput
-    -- drawNextScene
-
--- possible menu choice
-data Menu = NewGame | FinishGame
-
--- current level state
+-- current level state; main state of the world as well
 data Level = Level
-    { player        :: Player
-    -- , map           :: Map
-    , score         :: Int
-    , isFinished    :: Bool
-    , gravityVector :: Bool    -- ^ true, if gravity is upside-down
+    { player        :: Player     -- ^ player of the game
+    , map           :: Map        -- ^ collection of current game objects
+    , isFinished    :: Bool       -- ^ collision with obstacle occured
+    , gravityVector :: Bool       -- ^ true, if gravity is upside-down
+    , velocity      :: Velocity   -- ^ current player's (or world's) velocity
+    , distance      :: Distance   -- ^ distance player travelled so far
+    , lilcoins      :: Int        -- ^ number of coins player collected
     }
-
--- rectangular bounds of the object
-data Bounds = Bounds
-    { topLeft     :: Double
-    , bottomRight :: Double
-    } deriving (Show)
 
 -- player of the game
 data Player = Player Bounds
 
-type Distance = Double
+-- rectangular bounds of the object
+data Bounds = Bounds
+    { topLeft     :: Point
+    , topRight    :: Point
+    , bottomRight :: Point
+    , bottomLeft  :: Point
+    } deriving (Show)
 
-currentScore :: Distance -> Int -> Int
-currentScore _ _ = 0
+data Point = Point Double Double 
+    deriving (Show)
+
+type Map = [GameObject]
+type Distance = Double
+type Velocity = Double
+
+-- object, representing generated elements of the game
+data GameObject = GameObject 
+    { bounds       :: Bounds
+    , objectType   :: ObjectType
+    } 
+
+-- type of what can be generated
+data ObjectType = Wall | Spikes | Coin

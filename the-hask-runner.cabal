@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 841f7a59dd7e15835e10994529a91220ba2930767de2b75de75003b6a8cadf7b
+-- hash: e972d0d43e1ade38d1e38e7b0a81dadfc72e27cfa7b7fcaa69751eb896e1ca51
 
 name:           the-hask-runner
 version:        0.1.0
@@ -31,7 +31,7 @@ library
       HaskRunner
       HaskRunner.Core
       HaskRunner.Generation.Generator
-      HaskRunner.Graphics.SceneDrawer
+      HaskRunner.Graphics.Drawers
   other-modules:
       Paths_the_hask_runner
   hs-source-dirs:
@@ -39,25 +39,8 @@ library
   default-extensions: DuplicateRecordFields FlexibleContexts FlexibleInstances GeneralizedNewtypeDeriving LambdaCase NamedFieldPuns ScopedTypeVariables OverloadedStrings
   ghc-options: -Wall -fno-warn-type-defaults
   build-depends:
-      StateVar
-    , aeson
-    , animate
-    , base >=4.7 && <5
-    , bytestring
-    , containers
-    , key-state
-    , lens
-    , linear
-    , mtl
-    , random
-    , safe
-    , safe-exceptions
-    , sdl2
-    , sdl2-image
-    , sdl2-mixer
-    , sdl2-ttf
-    , text
-    , text-conversions
+      base >=4.7 && <5
+    , codeworld-api
   default-language: Haskell2010
 
 executable the-hask-runner
@@ -69,24 +52,7 @@ executable the-hask-runner
   default-extensions: DuplicateRecordFields FlexibleContexts FlexibleInstances GeneralizedNewtypeDeriving LambdaCase NamedFieldPuns ScopedTypeVariables OverloadedStrings
   ghc-options: -Wall -fno-warn-type-defaults -rtsopts -threaded -with-rtsopts=-N
   build-depends:
-      StateVar
-    , aeson
-    , animate
-    , base >=4.7 && <5
-    , bytestring
-    , containers
-    , key-state
-    , lens
-    , linear
-    , mtl
-    , random
-    , safe
-    , safe-exceptions
-    , sdl2
-    , sdl2-image
-    , sdl2-mixer
-    , sdl2-ttf
-    , text
-    , text-conversions
+      base >=4.7 && <5
+    , codeworld-api
     , the-hask-runner
   default-language: Haskell2010
