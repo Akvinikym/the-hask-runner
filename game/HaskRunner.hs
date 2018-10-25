@@ -17,19 +17,19 @@ initialWorld = Level initialPlayer exampleInitialObjects False True 0 0.5 0 0
         (Point (-1) 1)
         (Point 1 1)
         (Point 1 (-1))
-        (Point (-1) (-1))) 0 (-0.5)
+        (Point (-1) (-1))) 0.2 (0.2)
 
     exampleInitialObjects = [
         GameObject (Bounds
-            (Point (-5) (-4))
-            (Point 5 (-4))
-            (Point 5 (-6))
-            (Point (-5) (-6))) Platform]
-        -- GameObject (Bounds
-        --     (Point 9 1)
-        --     (Point 11 1)
-        --     (Point 11 (-4))
-        --     (Point 9 (-4))) Wall,
+            (Point (-5) (6))
+            (Point 6 (6))
+            (Point 6 (4))
+            (Point (-5) (4))) Platform,
+        GameObject (Bounds
+            (Point 6 1)
+            (Point 8 1)
+            (Point 8 (-4))
+            (Point 6 (-4))) Wall]
         -- GameObject (Bounds
         --     (Point (-1) (0))
         --     (Point 1 (0))
