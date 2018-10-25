@@ -4,13 +4,31 @@ import HaskRunner.Core
 
 -- | Player's objects supply functions
 
--- compute players location according to its velocity
-newPlayer :: Player -> Player
-newPlayer (Player bounds hor vert) = Player newBounds hor vert
+collision :: Bounds -> Level -> (Velocity, Velocity) -> (Velocity, Velocity)
+collision position level (h, v) = (newHor, newVert)
   where
-    newBounds = moveBounds bounds (hor, vert)
+    newHor
+      | horCollision = 0
+      | otherwise = h
+    newVert
+      | vertCollision = 0
+      | otherwise = v
+    horCollision = False
+    vertCollision = any collides (map bounds (levelMap level))
+    y (Point c1 c2) = c2
+    collides bound
+      = y (bottomLeft position) <= y (topLeft bound) && y (bottomRight position) <= y (topRight bound)
 
 -- move the player according to his velocity and gravity
 movePlayer :: Level -> Level
 movePlayer level
-  = level { player = (newPlayer (player level))}
+  = level { player = Player newPosition newHorVelocity newVertVelocity }
+  where
+    newPosition = moveBounds bounds (hor, vert)
+    bounds = pbounds (player level)
+    hor = pHorVelocity (player level)
+    vert = pVertVelocity (player level)
+    (v, h) = collision newPosition level (hor, vert)
+    newHorVelocity = v
+    newVertVelocity = h
+
