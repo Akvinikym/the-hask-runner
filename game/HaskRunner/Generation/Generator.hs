@@ -1,7 +1,9 @@
 module HaskRunner.Generation.Generator where
 
+import Data.Graph hiding (Bounds)	
+import Control.Monad
 import HaskRunner.Core
-import Data.Graph
+
 
 type Seed = Double
 
@@ -17,14 +19,6 @@ objectGenerator _ = startObjects ++ []
 -- Objects at the start of the level
 startObjects :: [GameObject]
 startObjects = []
-
--- Element of the game
-data GameObject = GameObject 
-    { bounds       :: Bounds
-    , objectType   :: ObjectType
-    } 
-
-data ObjectType = Wall | Spike | Coin
 
 -- Infinite list of gameObj batches
 levelGenerator :: Seed -> [[GameObject]]
@@ -55,33 +49,27 @@ getOutpaths w = _
 intersectTrapBounds :: Bounds -> Bounds -> Maybe Bounds
 intersectTrapBounds b b' = b''
     where
-        x1, y1 = topLeft b
-        x2, y2 = topRight b
-        x3, y3 = bottomRight b
-        x4, y4 = bottomLeft b
-        x1', y1' = topLeft b'
-        x2', y2' = topRight b'
-        x3', y3' = bottomRight b'
-        x4', y4' = bottomLeft b'
+        (x1, y1) = topLeft b
+        (x2, y2) = topRight b
+        (x3, y3) = bottomRight b
+        (x4, y4) = bottomLeft b
+        (x1', y1') = topLeft b'
+        (x2', y2') = topRight b'
+        (x3', y3') = bottomRight b'
+        (x4', y4') = bottomLeft b'
         y_up = min y1 y1'
         y_low = max y4 y4'
-        -- TODO Contains logic
+        isCollinear = (y1 == y1') || (y4 == y4')
         x1'' = (y_up - y4)*(x2 - x3)/(y2 - y4) + x3
         y1'' = y_up
-        x2'' = x2
-        y2'' =  y2
         x3'' = x1' - (x1' - x4')*(y1' - y_low)/(y1' - y4')
         y3'' = y_low
-        x4'' = x4'
-        y4'' = y4'
-        -- TODO Check if generated intersection is really going from first to second
-        b'' = Bounds (Point x1'' y1'') (Point x2'' y2'') (Point x3'' y3'') (Point x4'' y4'') 
-
+        b'' = if isCollinear then Nothing else Just Bounds (Point x1'' y1'') (Point x2 y2) (Point x3'' y3'') (Point x4' y4') 
 
 -- Get player horizontal and vertical speed from distance passed
 calculateSpeed :: Double -> (Double, Double)
 calculateSpeed x = (horizontalSpeed, verticalSpeed)
-    where
+    whereg
         initialSpeed = 2    -- TODO: take from Core
         acceleration = 0.2  -- TODO: take from Core
         verticalSpeed = 4   -- TODO: take from Core

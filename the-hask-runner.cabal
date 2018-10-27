@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 4b788782e4c797468074ea37ed2d6a748c75a182a9c5b6246bbc16738e47636a
+-- hash: 604fdb6419a5e12bb70ffba9686e9ac5066550c005a12891ac923eb4420aee53
 
 name:           the-hask-runner
 version:        0.1.0
@@ -42,6 +42,7 @@ library
   build-depends:
       base >=4.7 && <5
     , codeworld-api
+    , containers
   default-language: Haskell2010
 
 executable the-hask-runner
@@ -55,5 +56,6 @@ executable the-hask-runner
   build-depends:
       base >=4.7 && <5
     , codeworld-api
+    , containers
     , the-hask-runner
   default-language: Haskell2010

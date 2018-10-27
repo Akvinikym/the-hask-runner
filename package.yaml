@@ -19,6 +19,7 @@ ghc-options: -Wall -fno-warn-type-defaults
 dependencies:
     - base >=4.7 && <5
     - codeworld-api
+    - containers
 
 default-extensions:
 - DuplicateRecordFields
