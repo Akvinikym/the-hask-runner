@@ -2,6 +2,10 @@ module HaskRunner.Core where
 
 -- | Contains general-purpose data types and functions
 
+-- size of the playable area
+screenSize :: (Double, Double)
+screenSize = (20, 12)
+
 -- current level state; main state of the world as well
 data Level = Level
     { player        :: Player     -- ^ player of the game
@@ -68,6 +72,6 @@ data GameObject = GameObject
 -- type of what can be generated
 data ObjectType = 
     Platform    -- ^ rectangular platform, on which player can stand
-    | Wall 
+    | Wall
     | Spikes 
     | Coin
