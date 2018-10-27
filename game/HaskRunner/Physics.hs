@@ -61,9 +61,22 @@ data CollisionType = CUp | CDown | CLeft | CRight
 -- adjust velocity according to collision types
 adjustVelocity :: [CollisionType] -> (Velocity, Velocity) -> (Velocity, Velocity)
 adjustVelocity [] velocity = velocity
-adjustVelocity (collision:collisions) (hor, ver) = adjust collision
+adjustVelocity (collision:collisions) velocity
+  = adjustSingleCollision collision velocity `join` adjustVelocity collisions velocity
+
+adjustSingleCollision :: CollisionType -> (Velocity, Velocity) -> (Velocity, Velocity)
+adjustSingleCollision collision (hor, ver) = adjust collision
   where
     adjust CUp = (hor, 0)
     adjust CDown = (hor, 0)
     adjust CLeft = (0, ver)
     adjust CRight = (0, ver)
+
+-- if one of the velocities is 0, set result to 0,
+join :: (Velocity, Velocity) -> (Velocity, Velocity) -> (Velocity, Velocity)
+join (h1, v1) (h2, v2) = (h1 `vAnd` h2, v1 `vAnd` v2)
+  where
+    vAnd 0 _ = 0
+    vAnd _ 0 = 0
+    vAnd a _ = a
+
