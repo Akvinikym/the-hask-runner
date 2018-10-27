@@ -73,11 +73,11 @@ calculateSpeed x = (horizontalSpeed, verticalSpeed)
         initialSpeed = 2    -- TODO: take from Core
         acceleration = 0.2  -- TODO: take from Core
         verticalSpeed = 4   -- TODO: take from Core
-        horizontalSpeed = x / tPath(acceleration / 2, initialSpeed, -x)
-        tPath (a, b, c) = t1
+        horizontalSpeed = x / timeFromX(acceleration / 2, initialSpeed, x)
+        timeFromX (a, b, c) = t1
             where
                 e = -b * (2 * a)
-                d = b * b - 4 * a * c
+                d = b * b - 4 * a * (-c)
                 t1 = e + sqrt (d / (2 * a))
         
                 
