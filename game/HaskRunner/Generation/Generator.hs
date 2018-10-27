@@ -46,8 +46,10 @@ type Seed = Double
 -- getOutPaths :: GameObject -> [Bounds]
 -- getOutpaths w = _
 
+-- This method should return difference from first bound along left side of second bound
+-- substractTrapBounds :: Bounds -> Bounds -> Maybe Bounds
+
 -- Get intersection of two trapezioidal bounds
--- TODO change to intersectTrapBounds :: Bounds -> Bounds -> Maybe Bounds
 intersectTrapBounds :: Bounds -> Bounds -> Maybe Bounds
 intersectTrapBounds b b' = b''
     where
