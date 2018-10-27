@@ -10,6 +10,7 @@ movePlayer :: Level -> Level
 movePlayer level
   = level { player = Player newPosition h v }
   where
+    -- TODO: move speed adjustments to physics
     newPosition = moveBounds (pbounds (player level)) (h, v)
     hor = pHorVelocity (player level)
     vert = (acceleration level) + pVertVelocity (player level)
