@@ -51,9 +51,33 @@ getInPaths w = _
 getOutPaths :: Wall -> [Bounds]
 getOutpaths w = _
 
--- Get intersection of two paralellograms
-intersectBounds :: Bounds -> Bounds -> Bounds
-intersectPaths p p' = _
+-- Get intersection of two trapezioidal bounds
+intersectTrapBounds :: Bounds -> Bounds -> Maybe Bounds
+intersectTrapBounds b b' = b''
+    where
+        x1, y1 = topLeft b
+        x2, y2 = topRight b
+        x3, y3 = bottomRight b
+        x4, y4 = bottomLeft b
+        x1', y1' = topLeft b'
+        x2', y2' = topRight b'
+        x3', y3' = bottomRight b'
+        x4', y4' = bottomLeft b'
+        y_up = min y1 y1'
+        y_low = max y4 y4'
+        -- TODO Contains logic
+        x1'' = (y_up - y4)*(x2 - x3)/(y2 - y4) + x3
+        y1'' = y_up
+        x2'' = x2
+        y2'' =  y2
+        x3'' = x1' - (x1' - x4')*(y1' - y_low)/(y1' - y4')
+        y3'' = y_low
+        x4'' = x4'
+        y4'' = y4'
+        -- TODO Check if generated intersection is really going from first to second
+        b'' = Bounds (Point x1'' y1'') (Point x2'' y2'') (Point x3'' y3'') (Point x4'' y4'') 
+
+
 
 -- Get player horizontal and vertical speed from distance passed
 calculateSpped :: Double -> (Double, Double)
