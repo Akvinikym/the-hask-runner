@@ -1,14 +1,18 @@
 module HaskRunner.ObjectsHandlers.PlayerHandler where
 
 import HaskRunner.Core
+import HaskRunner.Physics
 
 -- | Player's objects supply functions
 
--- move the player up or down if he is not staying on platforms
+-- move the player according to his velocity and gravity
 movePlayer :: Level -> Level
-movePlayer level = level { player = Player newBounds }
+movePlayer level
+  = level { player = Player newPosition h v }
   where
-    Level (Player bounds) _ _ gravityIsDown _ vertVelocity _ _ = level
-    newBounds
-        | gravityIsDown = moveBounds bounds (0, -1 * vertVelocity)
-        | otherwise     = moveBounds bounds (0, vertVelocity)
+    -- TODO: move speed adjustments to physics
+    newPosition = moveBounds (pbounds (player level)) (h, v)
+    hor = pHorVelocity (player level)
+    vert = (acceleration level) + pVertVelocity (player level)
+    (h, v) = collision (pbounds (player level))(map bounds (levelMap level)) (hor, vert)
+
