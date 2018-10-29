@@ -15,6 +15,6 @@ movePlayer level
     hor = pHorVelocity (player level)
     vert = (acceleration level) + pVertVelocity (player level)
     (h, v)
-      = collision (pbounds (player level))(map bounds (levelMap level)) (hor, vert)
+      = collision (pbounds (player level))(map bounds (levelMap level ++ (edges level))) (hor, vert)
     newAcceleration 0 = 0
     newAcceleration _ = acceleration level
