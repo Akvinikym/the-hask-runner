@@ -4,19 +4,20 @@ import CodeWorld
 import HaskRunner.Core
 import HaskRunner.Graphics.Drawers
 import HaskRunner.ObjectsHandlers.PlayerHandler
+import HaskRunner.ObjectsHandlers.GameObjectsHandler
 
 mainLoop :: IO ()
 mainLoop = interactionOf initialWorld timingWorld eventsWorld drawWorld
 
 initialWorld :: Level
 initialWorld 
-    = Level initialPlayer exampleInitialObjects levelEdges False True 0 0 0 0
+    = Level initialPlayer exampleInitialObjects levelEdges False True 0.5 0 0 0
   where
     initialPlayer = Player (Bounds
         (Point (-1) 1)
         (Point 1 1)
         (Point 1 (-1))
-        (Point (-1) (-1))) 0 0.5
+        (Point (-1) (-1))) 0 (-0.5)
 
     exampleInitialObjects = [
         GameObject (Bounds
@@ -36,7 +37,7 @@ initialWorld
         --     (Point (-1) (-1))) Coin]
 
 timingWorld :: Double -> Level -> Level
-timingWorld _ level = movePlayer level
+timingWorld _  = movePlayer . moveObjects
 
 eventsWorld :: Event -> Level -> Level
 eventsWorld _ level = level
