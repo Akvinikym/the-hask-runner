@@ -9,7 +9,7 @@ import HaskRunner.Core
 drawLevel :: Level -> Picture
 drawLevel level = (drawPlayer (player level))
   <> foldr ((<>) . drawObject) blank (levelMap level)
-  <> drawEdges
+  <> foldr ((<>) . drawObject) blank (edges level)
 
 -- draw player
 drawPlayer :: Player -> Picture
@@ -50,26 +50,3 @@ drawCircularObject bounds colour
         (diameter, _) = boundsWidthHeight bounds
         (Point centerX centerY) = boundsCenter bounds
         circ = translated centerX centerY (solidCircle (diameter / 2))
-
--- draw edges of the screen, which are player's death
-drawEdges :: Picture
-drawEdges = drawObject bottomWall 
-  <> drawObject leftWall
-  <> drawObject upWall
-  where
-    (screenWidth, screenHeight) = screenSize
-    bottomWall = GameObject (Bounds
-        (Point (- screenWidth + 1) (- screenHeight + 3)) 
-        (Point (screenWidth - 1) (- screenHeight + 3)) 
-        (Point (screenWidth - 1) (- screenHeight + 2)) 
-        (Point (- screenWidth + 1) (- screenHeight + 2))) Wall
-    leftWall = GameObject (Bounds
-        (Point (- screenWidth + 1) (screenHeight - 3)) 
-        (Point (- screenWidth + 2) (screenHeight - 3)) 
-        (Point (- screenWidth + 2) (- screenHeight + 2)) 
-        (Point (- screenWidth + 1) (- screenHeight + 2))) Wall
-    upWall = GameObject (Bounds
-        (Point (- screenWidth + 1) (screenHeight - 2)) 
-        (Point (screenWidth - 1) (screenHeight - 2)) 
-        (Point (screenWidth - 1) (screenHeight - 3)) 
-        (Point (- screenWidth + 1) (screenHeight - 3))) Wall

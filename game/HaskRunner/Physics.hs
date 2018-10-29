@@ -3,11 +3,15 @@ module HaskRunner.Physics where
 import HaskRunner.Core
 
 -- updates the velocities based on whether or not collision happened
-collision :: Bounds -> [Bounds] -> (Velocity, Velocity) -> (Velocity, Velocity)
+collision :: Bounds 
+  -> [Bounds] 
+  -> (Velocity, Velocity) 
+  -> (Velocity, Velocity)
 collision object otherObjects (h, v) = (newHor, newVert)
   where
     hasCollided = collisionHappened otherObjects object
-    (newHor, newVert) = adjustVelocity (collisionType oldObject object hasCollided) (h, v)
+    (newHor, newVert) 
+      = adjustVelocity (collisionType oldObject object hasCollided) (h, v)
     -- approximate old position
     oldObject = moveBounds object ((-h), (-v))
 
@@ -22,16 +26,19 @@ collided :: Bounds -> Bounds -> Bool
 collided o1 o2 = collidedX && collidedY
   where
     collidedX
-      = x (bottomRight o1) >= x (topLeft o2) && x (bottomRight o2) >= x (topLeft o1)
+      = x (bottomRight o1) >= x (topLeft o2) && 
+        x (bottomRight o2) >= x (topLeft o1)
     collidedY
-      = y (bottomRight o1) <= y (topLeft o2) && y (bottomRight o2) <= y (topLeft o1)
+      = y (bottomRight o1) <= y (topLeft o2) && 
+        y (bottomRight o2) <= y (topLeft o1)
     x (Point c1 _) = c1
     y (Point _ c2) = c2
 
 -- return all collision directions which occured with the object
 collisionType :: Bounds -> Bounds -> [Bounds] -> [CollisionType]
 collisionType _ _ [] = []
-collisionType oldObj obj (bound:bounds) = collisions ++ (collisionType oldObj obj bounds)
+collisionType oldObj obj (bound:bounds) = collisions ++ 
+    (collisionType oldObj obj bounds)
   where
     collisions
       | collidedFromLeft = [CLeft]
@@ -59,12 +66,17 @@ collisionType oldObj obj (bound:bounds) = collisions ++ (collisionType oldObj ob
 data CollisionType = CUp | CDown | CLeft | CRight
 
 -- adjust velocity according to collision types
-adjustVelocity :: [CollisionType] -> (Velocity, Velocity) -> (Velocity, Velocity)
+adjustVelocity :: [CollisionType] 
+  -> (Velocity, Velocity) 
+  -> (Velocity, Velocity)
 adjustVelocity [] velocity = velocity
 adjustVelocity (collision:collisions) velocity
-  = adjustSingleCollision collision velocity `join` adjustVelocity collisions velocity
+  = adjustSingleCollision collision velocity `join` 
+    adjustVelocity collisions velocity
 
-adjustSingleCollision :: CollisionType -> (Velocity, Velocity) -> (Velocity, Velocity)
+adjustSingleCollision :: CollisionType
+  -> (Velocity, Velocity) 
+  -> (Velocity, Velocity)
 adjustSingleCollision collision (hor, ver) = adjust collision
   where
     adjust CUp = (hor, 0)
@@ -79,4 +91,3 @@ join (h1, v1) (h2, v2) = (h1 `vAnd` h2, v1 `vAnd` v2)
     vAnd 0 _ = 0
     vAnd _ 0 = 0
     vAnd a _ = a
-

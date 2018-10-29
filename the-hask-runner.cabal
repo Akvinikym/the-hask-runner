@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 50d020cd66d9b0e35295fe2b95d51059c0c19035c58237143f8c5299118cec53
+-- hash: 704c24e6eb879d7eaf24dace8eed1ea995460155bcf27eb843dea0050639f5a1
 
 name:           the-hask-runner
 version:        0.1.0
@@ -32,6 +32,7 @@ library
       HaskRunner.Core
       HaskRunner.Generation.Generator
       HaskRunner.Graphics.Drawers
+      HaskRunner.ObjectsHandlers.GameObjectsHandler
       HaskRunner.ObjectsHandlers.PlayerHandler
       HaskRunner.Physics
   other-modules:

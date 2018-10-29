@@ -10,6 +10,7 @@ screenSize = (20, 12)
 data Level = Level
     { player        :: Player     -- ^ player of the game
     , levelMap      :: Map        -- ^ collection of current game objects
+    , edges         :: Map        -- ^ collection of game borders
     , isFinished    :: Bool       -- ^ collision with obstacle occured
     , gravityIsDown :: Bool       -- ^ true, if gravity is upside-down
     , horVelocity   :: Velocity   -- ^ world's horizontal velocity
@@ -21,9 +22,9 @@ data Level = Level
 
 -- player of the game
 data Player = Player
-  {  pbounds :: Bounds -- players position
-  ,  pHorVelocity :: Velocity -- player's horizontal velocity
-  ,  pVertVelocity :: Velocity -- player's vertical velocity
+  {  pbounds :: Bounds         -- ^ players position
+  ,  pHorVelocity :: Velocity  -- ^ player's horizontal velocity
+  ,  pVertVelocity :: Velocity -- ^ player's vertical velocity
   }
 
 
@@ -78,3 +79,23 @@ data ObjectType =
     | Wall
     | Spikes 
     | Coin
+
+levelEdges :: Map
+levelEdges = [bottomWall, leftWall, upWall]
+  where
+    (screenWidth, screenHeight) = screenSize
+    bottomWall = GameObject (Bounds
+        (Point (- screenWidth + 1) (- screenHeight + 3)) 
+        (Point (screenWidth - 1) (- screenHeight + 3)) 
+        (Point (screenWidth - 1) (- screenHeight + 2)) 
+        (Point (- screenWidth + 1) (- screenHeight + 2))) Wall
+    leftWall = GameObject (Bounds
+        (Point (- screenWidth + 1) (screenHeight - 3)) 
+        (Point (- screenWidth + 2) (screenHeight - 3)) 
+        (Point (- screenWidth + 2) (- screenHeight + 2)) 
+        (Point (- screenWidth + 1) (- screenHeight + 2))) Wall
+    upWall = GameObject (Bounds
+        (Point (- screenWidth + 1) (screenHeight - 2)) 
+        (Point (screenWidth - 1) (screenHeight - 2)) 
+        (Point (screenWidth - 1) (screenHeight - 3)) 
+        (Point (- screenWidth + 1) (screenHeight - 3))) Wall
