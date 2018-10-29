@@ -8,6 +8,10 @@ screenHeight = 12
 screenWidth :: Double
 screenWidth = 20
 
+-- how fast the level accelerates
+horizontalAcceleration :: Double
+horizontalAcceleration = 0.05
+
 -- current level state; main state of the world as well
 data Level = Level
     { player        :: Player     -- ^ player of the game
@@ -88,6 +92,12 @@ data ObjectType =
     | Wall      -- ^ borders of the game
     | Spikes    -- ^ death-bringing obstacle
     | Coin      -- ^ source of additional points
+    deriving (Eq)
+
+-- if collision with object causes death
+deadObject :: GameObject -> Bool
+deadObject (GameObject _ objType) 
+    = objType == Wall || objType == Spikes
 
 -- find out, if the object is on the screen
 onScreen :: GameObject -> Bool
