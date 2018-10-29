@@ -9,12 +9,9 @@ import HaskRunner.ObjectsHandlers.GameObjectsHandler
 mainLoop :: IO ()
 mainLoop = interactionOf initialWorld timingWorld eventsWorld drawWorld
 
-baseAcceleration :: Double
-baseAcceleration = (-0.02)
-
 initialWorld :: Level
 initialWorld
-    = Level initialPlayer exampleInitialObjects levelEdges False True 0.1 baseAcceleration 0 0
+    = Level initialPlayer exampleInitialObjects levelEdges False True 0.1 0 0
   where
     initialPlayer = Player (Bounds
         (Point (-1) 1)
@@ -44,12 +41,9 @@ timingWorld _  = movePlayer . moveObjects
 
 eventsWorld :: Event -> Level -> Level
 eventsWorld (KeyPress "F") level
-  = level { acceleration = newAcceleration, gravityIsDown = newDirection}
+  = level {gravityIsDown = newDirection}
   where
     newDirection = not (gravityIsDown level)
-    newAcceleration
-      | gravityIsDown level = baseAcceleration
-      | otherwise = -baseAcceleration
 eventsWorld _ level = level
 
 drawWorld :: Level -> Picture
