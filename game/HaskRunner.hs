@@ -40,7 +40,7 @@ timingWorld :: Double -> Level -> Level
 timingWorld _ level = movePlayer level
 
 eventsWorld :: Event -> Level -> Level
-eventsWorld (KeyPress "Up") level
+eventsWorld (KeyPress "F") level
   = level { acceleration = newAcceleration, gravityIsDown = newDirection}
   where
     newDirection = not (gravityIsDown level)
