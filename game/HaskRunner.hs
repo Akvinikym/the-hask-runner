@@ -14,7 +14,7 @@ baseAcceleration = (-0.02)
 
 initialWorld :: Level
 initialWorld
-    = Level initialPlayer exampleInitialObjects levelEdges False True baseAcceleration 0 0 0
+    = Level initialPlayer exampleInitialObjects levelEdges False True 0.1 baseAcceleration 0 0
   where
     initialPlayer = Player (Bounds
         (Point (-1) 1)
