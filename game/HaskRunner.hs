@@ -1,4 +1,4 @@
-module HaskRunner where 
+module HaskRunner where
 
 import CodeWorld
 import HaskRunner.Core
@@ -9,8 +9,7 @@ mainLoop :: IO ()
 mainLoop = interactionOf initialWorld timingWorld eventsWorld drawWorld
 
 initialWorld :: Level
-initialWorld 
-    = Level initialPlayer exampleInitialObjects levelEdges False True 0 0 0 0
+initialWorld = Level initialPlayer exampleInitialObjects levelEdges False True 0 (-0.02) 0 0
   where
     initialPlayer = Player (Bounds
         (Point (-1) 1)
@@ -39,6 +38,10 @@ timingWorld :: Double -> Level -> Level
 timingWorld _ level = movePlayer level
 
 eventsWorld :: Event -> Level -> Level
+eventsWorld (KeyPress "Up") level
+  = level { acceleration = -oldAcceleration }
+  where
+    oldAcceleration = acceleration level
 eventsWorld _ level = level
 
 drawWorld :: Level -> Picture

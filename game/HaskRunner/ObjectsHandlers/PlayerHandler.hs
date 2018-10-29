@@ -14,7 +14,5 @@ movePlayer level
     newPosition = moveBounds (pbounds (player level)) (h, v)
     hor = pHorVelocity (player level)
     vert = (acceleration level) + pVertVelocity (player level)
-    (h, v) = collision 
-      (pbounds (player level)) 
-      (map bounds (levelMap level)) 
-      (hor, vert)
+    (h, v)
+      = collision (pbounds (player level))(map bounds (levelMap level)) (hor, vert)
