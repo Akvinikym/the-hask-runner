@@ -8,13 +8,12 @@ import HaskRunner.Physics
 -- move the player according to his velocity and gravity
 movePlayer :: Level -> Level
 movePlayer level
-  = level { player = Player newPosition h v}
+  = level { player = (Player newPosition h v)}
   where
-    -- TODO: move speed adjustments to physics
-    newPosition = moveBounds (pbounds (player level)) (h, v)
+    newPosition = moveBounds playerBounds (h, v)
+    playerBounds = pbounds (player level)
+    currentGravity = adjustGravity (gravityIsDown level) baseGravity
+    levelObjects = map bounds (levelMap level ++ (edges level))
     hor = pHorVelocity (player level)
-    vert = (adjustGravity (gravityIsDown level) baseGravity) + pVertVelocity (player level)
-    (h, v)
-      = collision
-        (pbounds (player level))
-        (map bounds (levelMap level ++ (edges level))) (hor, vert)
+    vert = pVertVelocity (player level)
+    (h, v) = adjustVelocity currentGravity levelObjects playerBounds (hor, vert)

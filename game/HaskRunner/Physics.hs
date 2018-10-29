@@ -2,16 +2,58 @@ module HaskRunner.Physics where
 
 import HaskRunner.Core
 
--- updates the velocities based on whether or not collision happened
-collision :: Bounds
+-- Adjust velocity based on gravity and bounds
+adjustVelocity :: Double -> [Bounds] -> Bounds -> (Velocity, Velocity) -> (Velocity, Velocity)
+adjustVelocity gravity objects player (hor, ver) = (newHor, newVert)
+  where
+    getCollisions = collisions player objects (hor, ver)
+    newGravity = gravityEffect getCollisions gravity
+    (h, v) = adjustForCollisions getCollisions (hor, ver)
+    newHor = h
+    newVert = newGravity + v
+
+gravityEffect :: [CollisionType] ->  Double -> Double
+gravityEffect collisions gravity
+  | gravity < 0 && CUp `elem` collisions = 0
+  | gravity > 0 && CDown `elem` collisions = 0
+  | otherwise = gravity
+
+-- adjust velocity according to collision types
+adjustForCollisions :: [CollisionType]
+  -> (Velocity, Velocity)
+  -> (Velocity, Velocity)
+adjustForCollisions [] velocity = velocity
+adjustForCollisions (collision:collisions) velocity
+  = adjustSingleCollision collision velocity `join`
+    adjustForCollisions collisions velocity
+
+adjustSingleCollision :: CollisionType
+  -> (Velocity, Velocity)
+  -> (Velocity, Velocity)
+adjustSingleCollision collision (hor, ver) = adjust collision (hor, ver)
+  where
+    adjust CUp (h, v) = (h, if v < 0 then 0 else v)
+    adjust CDown (h, v) = (h, if v > 0 then 0 else v)
+    adjust CLeft (h, v) = (0, v)
+    adjust CRight (h, v) = (0, v)
+
+-- if one of the velocities is 0, set result to 0,
+join :: (Velocity, Velocity) -> (Velocity, Velocity) -> (Velocity, Velocity)
+join (h1, v1) (h2, v2) = (h1 `vAnd` h2, v1 `vAnd` v2)
+  where
+    vAnd 0 _ = 0
+    vAnd _ 0 = 0
+    vAnd a _ = a
+
+-- get all collisions that occured
+collisions :: Bounds
   -> [Bounds]
   -> (Velocity, Velocity)
-  -> (Velocity, Velocity)
-collision object otherObjects (h, v) = (newHor, newVert)
+  -> [CollisionType]
+collisions object otherObjects (h, v) = collisionTypes
   where
-    hasCollided = collisionHappened otherObjects object
-    (newHor, newVert)
-      = adjustVelocity (collisionType oldObject object hasCollided) (h, v)
+    collidedObjects = collisionHappened otherObjects object
+    collisionTypes = collisionType oldObject object collidedObjects
     -- approximate old position
     oldObject = moveBounds object ((-h), (-v))
 
@@ -52,8 +94,10 @@ collisionType oldObj obj (bound:bounds) = collisions ++
       = left oldObj >= right bound && left obj < right bound
     collidedFromTop
       = bottom oldObj > top bound && bottom obj <= top bound
+      || bottom oldObj <= top bound && bottom obj <= top bound && top obj >= top bound
     collidedFromBottom
       = top oldObj < bottom bound && top obj >= bottom bound
+      || top oldObj >= bottom bound && top obj >= bottom bound && bottom obj <= bottom bound
     left = x . topLeft
     right = x . bottomRight
     top = y . topLeft
@@ -64,33 +108,7 @@ collisionType oldObj obj (bound:bounds) = collisions ++
 -- CollisionType shows from which side object crossed other object:
 -- It is calculated relative to nonmoving object
 data CollisionType = CUp | CDown | CLeft | CRight
-
--- adjust velocity according to collision types
-adjustVelocity :: [CollisionType]
-  -> (Velocity, Velocity)
-  -> (Velocity, Velocity)
-adjustVelocity [] velocity = velocity
-adjustVelocity (collision:collisions) velocity
-  = adjustSingleCollision collision velocity `join`
-    adjustVelocity collisions velocity
-
-adjustSingleCollision :: CollisionType
-  -> (Velocity, Velocity)
-  -> (Velocity, Velocity)
-adjustSingleCollision collision (hor, ver) = adjust collision
-  where
-    adjust CUp = (hor, 0)
-    adjust CDown = (hor, 0)
-    adjust CLeft = (0, ver)
-    adjust CRight = (0, ver)
-
--- if one of the velocities is 0, set result to 0,
-join :: (Velocity, Velocity) -> (Velocity, Velocity) -> (Velocity, Velocity)
-join (h1, v1) (h2, v2) = (h1 `vAnd` h2, v1 `vAnd` v2)
-  where
-    vAnd 0 _ = 0
-    vAnd _ 0 = 0
-    vAnd a _ = a
+  deriving (Eq)
 
 adjustGravity :: Bool-> Double -> Double
 adjustGravity True base  = base

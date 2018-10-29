@@ -11,13 +11,13 @@ mainLoop = interactionOf initialWorld timingWorld eventsWorld drawWorld
 
 initialWorld :: Level
 initialWorld
-    = Level initialPlayer exampleInitialObjects levelEdges False True 0.1 0 0
+    = Level initialPlayer exampleInitialObjects levelEdges False True 0.2 0 0
   where
     initialPlayer = Player (Bounds
         (Point (-1) 1)
         (Point 1 1)
         (Point 1 (-1))
-        (Point (-1) (-1))) 0 (-0.5)
+        (Point (-1) (-1))) 0 0
 
     exampleInitialObjects = [
         GameObject (Bounds
