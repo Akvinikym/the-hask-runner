@@ -3,8 +3,10 @@ module HaskRunner.Core where
 -- | Contains general-purpose data types and functions
 
 -- size of the playable area
-screenSize :: (Double, Double)
-screenSize = (20, 12)
+screenHeight :: Double
+screenHeight = 12
+screenWidth :: Double
+screenWidth = 20
 
 -- current level state; main state of the world as well
 data Level = Level
@@ -56,6 +58,13 @@ boundsWidthHeight :: Bounds -> (Double, Double)
 boundsWidthHeight (Bounds (Point x1 y1) _ (Point x2 y2) _)
     = (x2 - x1, y2 - y1)
 
+-- find right-most and left-most X coordinates of the bounds
+boundsLeftRightCoords :: Bounds -> (Double, Double)
+boundsLeftRightCoords bounds = (leftMost, rightMost)
+  where
+    Point leftMost _  = topLeft bounds
+    Point rightMost _ = topRight bounds
+
 
 data Point = Point Double Double
     deriving (Show)
@@ -76,14 +85,24 @@ data GameObject = GameObject
 -- type of what can be generated
 data ObjectType =
     Platform    -- ^ rectangular platform, on which player can stand
-    | Wall
-    | Spikes 
-    | Coin
+    | Wall      -- ^ borders of the game
+    | Spikes    -- ^ death-bringing obstacle
+    | Coin      -- ^ source of additional points
 
+-- find out, if the object is on the screen
+onScreen :: GameObject -> Bool
+onScreen obj
+    | leftMost < screenWidth && 
+      rightMost > (-screenWidth) = True
+    | otherwise                  = False
+  where
+    (leftMost, rightMost) = boundsLeftRightCoords (bounds obj)
+
+
+-- edges of the level represented by walls
 levelEdges :: Map
 levelEdges = [bottomWall, leftWall, upWall]
   where
-    (screenWidth, screenHeight) = screenSize
     bottomWall = GameObject (Bounds
         (Point (- screenWidth + 1) (- screenHeight + 3)) 
         (Point (screenWidth - 1) (- screenHeight + 3)) 
