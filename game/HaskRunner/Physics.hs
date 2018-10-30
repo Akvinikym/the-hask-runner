@@ -3,34 +3,46 @@ module HaskRunner.Physics where
 import HaskRunner.Core
 
 -- Adjust velocity based on gravity and bounds
-adjustVelocity :: Double -> [Bounds] -> Bounds -> (Velocity, Velocity) -> (Velocity, Velocity)
-adjustVelocity gravity objects player (hor, ver) = (newHor, newVert)
+adjustVelocity :: Double
+               -> Double
+               -> [Bounds]
+               -> Bounds
+               -> (Velocity, Velocity)
+               -> (Velocity, Velocity)
+adjustVelocity worldVel gravity objects player (hor, ver) = (newHor, newVert)
   where
     getCollisions = collisions player objects (hor, ver)
     newGravity = gravityEffect getCollisions gravity
     (h, v) = adjustForCollisions getCollisions (hor, ver)
-    newHor = h
+    newHor = adjustHorVelocity getCollisions worldVel hor
     newVert = newGravity + v
 
 gravityEffect :: [CollisionType] ->  Double -> Double
+gravityEffect [] gravity = gravity
 gravityEffect collisions gravity
   | gravity < 0 && CUp `elem` collisions = 0
   | gravity > 0 && CDown `elem` collisions = 0
   | otherwise = gravity
 
+adjustHorVelocity :: [CollisionType] -> Double -> Double -> Double
+adjustHorVelocity collisions worldVel currentHor
+  | CLeft `elem` collisions = -worldVel
+  | otherwise = 0
+
 -- adjust velocity according to collision types
 adjustForCollisions :: [CollisionType]
-  -> (Velocity, Velocity)
-  -> (Velocity, Velocity)
+                    -> (Velocity, Velocity)
+                    -> (Velocity, Velocity)
 adjustForCollisions [] velocity = velocity
 adjustForCollisions (collision:collisions) velocity
   = adjustSingleCollision collision velocity `join`
     adjustForCollisions collisions velocity
 
 adjustSingleCollision :: CollisionType
-  -> (Velocity, Velocity)
-  -> (Velocity, Velocity)
-adjustSingleCollision collision (hor, ver) = adjust collision (hor, ver)
+                      -> (Velocity, Velocity)
+                      -> (Velocity, Velocity)
+adjustSingleCollision collision (hor, ver)
+  = adjust collision (hor, ver)
   where
     adjust CUp (h, v) = (h, if v < 0 then 0 else v)
     adjust CDown (h, v) = (h, if v > 0 then 0 else v)
@@ -83,21 +95,22 @@ collisionType oldObj obj (bound:bounds) = collisions ++
     (collisionType oldObj obj bounds)
   where
     collisions
-      | collidedFromLeft = [CLeft]
-      | collidedFromRight = [CRight]
       | collidedFromTop = [CUp]
       | collidedFromBottom = [CDown]
+      | collidedFromLeft = [CLeft]
+      | collidedFromRight = [CRight]
       | otherwise = []
     collidedFromLeft
       = right oldObj < left bound && right obj >= left bound
+        || right oldObj >= left bound && right obj >= left bound
     collidedFromRight
       = left oldObj >= right bound && left obj < right bound
     collidedFromTop
       = bottom oldObj > top bound && bottom obj <= top bound
-      || bottom oldObj <= top bound && bottom obj <= top bound && top obj >= top bound
+      || bottom oldObj <= top bound && bottom obj <= top bound && top obj >= top bound && right obj > left bound
     collidedFromBottom
       = top oldObj < bottom bound && top obj >= bottom bound
-      || top oldObj >= bottom bound && top obj >= bottom bound && bottom obj <= bottom bound
+      || top oldObj >= bottom bound && top obj >= bottom bound && bottom obj <= bottom bound && right obj < left bound
     left = x . topLeft
     right = x . bottomRight
     top = y . topLeft

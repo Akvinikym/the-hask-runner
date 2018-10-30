@@ -38,12 +38,17 @@ initialWorld
             (Point 3 4)
             (Point 13 4)
             (Point 13 2)
-            (Point 3 2)) Platform]
-        -- GameObject (Bounds
-        --     (Point (-1) (0))
-        --     (Point 1 (0))
-        --     (Point 1 (-2))
-        --     (Point (-1) (-2))) Spikes,
+            (Point 3 2)) Platform,
+        GameObject (Bounds
+            (Point (3) (1))
+            (Point 5 (1))
+            (Point 5 (-1))
+            (Point (3) (-1))) Platform,
+        GameObject (Bounds
+            (Point (3) (-1))
+            (Point 5 (-1))
+            (Point 5 (-3))
+            (Point (3) (-3))) Platform]
         -- GameObject (Bounds
         --     (Point (-1) 1)
         --     (Point 1 1)

@@ -14,9 +14,14 @@ movePlayer level
     playerBounds = pbounds (player level)
     currentGravity = adjustGravity (gravityIsDown level) baseGravity
     levelObjects = map bounds (levelMap level ++ (edges level))
+    worldVel = horVelocity level
     hor = pHorVelocity (player level)
     vert = pVertVelocity (player level)
-    (h, v) = adjustVelocity currentGravity levelObjects playerBounds (hor, vert)
+    (h, v)
+      = adjustVelocity
+        worldVel
+        currentGravity
+        levelObjects playerBounds (hor, vert)
 
 -- find out, if the player dies, collided with some obstacle
 playerDied :: Level -> Bool
