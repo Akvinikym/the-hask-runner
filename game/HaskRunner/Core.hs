@@ -100,7 +100,7 @@ data ObjectType =
 -- if collision with object causes death
 deadObject :: GameObject -> Bool
 deadObject (GameObject _ objType)
-    = objType == Wall || objType == Spikes || objType == Platform
+    = objType == Wall || objType == Spikes
 
 -- find out, if the object is on the screen
 onScreen :: GameObject -> Bool

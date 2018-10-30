@@ -110,7 +110,7 @@ collisionType oldObj obj (bound:bounds) = collisions ++
       || bottom oldObj <= top bound && bottom obj <= top bound && top obj >= top bound && right obj > left bound
     collidedFromBottom
       = top oldObj < bottom bound && top obj >= bottom bound
-      || top oldObj >= bottom bound && top obj >= bottom bound && bottom obj <= bottom bound && right obj < left bound
+      || top oldObj >= bottom bound && top obj >= bottom bound && bottom obj <= bottom bound && right obj > left bound
     left = x . topLeft
     right = x . bottomRight
     top = y . topLeft
