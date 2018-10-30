@@ -20,9 +20,9 @@ movePlayer level
 
 -- find out, if the player dies, collided with some obstacle
 playerDied :: Level -> Bool
-playerDied (Level (Player pBounds _ _) objects _ _ _ _ _ _)
+playerDied (Level (Player pBounds _ _) objects edges _ _ _ _ _)
     = any deadCollision onScreenObjects
   where
-    onScreenObjects = filter onScreen objects
+    onScreenObjects = filter onScreen (objects ++ edges)
     deadCollision object
         = collided pBounds (bounds object) && deadObject object
