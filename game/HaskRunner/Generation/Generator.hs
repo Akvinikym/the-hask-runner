@@ -1,12 +1,25 @@
 module HaskRunner.Generation.Generator where
 
-import Data.Graph hiding (Bounds)	
-import Control.Monad
+import Data.Graph hiding (Bounds)
+-- import Control.Monad
 import HaskRunner.Core
-
-
+import System.Random
+-- import Data.Random
 type Seed = Double
 
+
+
+-- Helper function for phi_inverse
+rational_approx :: Double -> Double
+rational_approx t = t - ((0.010328*t + 0.802853)*t + 2.515517) / 
+               (((0.001308*t + 0.189269)*t + 1.432788)*t + 1.0);
+
+-- Inverse of normal CDF
+phi_inverse :: Double -> Double
+phi_inverse p = 
+    if p < 0.5
+        then  - rational_approx( sqrt (-2.0*log(p)) )
+        else  rational_approx( sqrt (-2.0*log(1.0 - p)) )
 
 -- {-|
 -- Generate infinite list if objects from random seed
@@ -21,16 +34,45 @@ type Seed = Double
 -- startObjects :: [GameObject]
 -- startObjects = []
 
--- -- Infinite list of gameObj batches
--- levelGenerator :: Seed -> [[GameObject]]
--- levelGenerator s = _
+-- Infinite list of gameObj batches
+levelGenerator :: Int -> [[GameObject]]
+levelGenerator s = map generateRandomWalls seedRvs
+    where 
+        g = mkStdGen s
+        seedRvs =  (randoms g :: [Int])
+
+platformHeight = 1.1
+
+makeWall :: Double -> Double -> Double -> GameObject
+makeWall x y l = GameObject bounds Platform
+    where 
+        bounds = Bounds p1 p2 p3 p4
+        p1 = Point x y
+        p2 = Point (x + l) y
+        p3 = Point (x + l) (y - platformHeight)
+        p4 = Point x (y - platformHeight)
 
 -- -- Randomly generate walls
--- --  1. Consider player size
+-- --  1. Consider player size (Done)
 -- --  2. Consider player speed (?)
 -- --  3. Consider previous walls (?) (min delta between walls)
--- generateRandomWalls :: Seed -> [GameObject]
--- generateRandomWalls s = _
+generateRandomWalls :: Int -> [GameObject]
+generateRandomWalls s = zipWith3 makeWall platformXOrigins platformYOrigins platformLenghts
+        where 
+            meanNumberOfWalls = 30.0
+            screenHeight = 50.0
+            meanOriginOffset = meanWallLength / 3.0
+            meanWallLength = 10.0
+            playerHeight = 2.0
+            yLevels :: Int
+            yLevels = floor (screenHeight / (playerHeight * 4.0))
+            normalRvs = map phi_inverse (randomRs (0.0, 1.0) (mkStdGen s))
+            uniformRvs = randomRs (0, yLevels) (mkStdGen s)
+            numberOfWalls = round (meanNumberOfWalls * (head normalRvs))
+            platformLenghts = map (meanWallLength *) (take numberOfWalls (drop 1 normalRvs))
+            platformYOrigins = map (\t -> (playerHeight * 4.0) * (fromIntegral t)) (take numberOfWalls uniformRvs)
+            platformXOrigins = scanl (+) 0 (map (meanOriginOffset * ) (take numberOfWalls (drop (1 + numberOfWalls) normalRvs)))
+
 
 -- -- Generate graph with walls as vertices and paths inbetween as edges
 -- makeGraph :: [GameObject] -> Graph
