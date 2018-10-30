@@ -17,3 +17,12 @@ movePlayer level
     hor = pHorVelocity (player level)
     vert = pVertVelocity (player level)
     (h, v) = adjustVelocity currentGravity levelObjects playerBounds (hor, vert)
+
+-- find out, if the player dies, collided with some obstacle
+playerDied :: Level -> Bool
+playerDied (Level (Player pBounds _ _) objects _ _ _ _ _ _)
+    = any deadCollision onScreenObjects
+  where
+    onScreenObjects = filter onScreen objects
+    deadCollision object
+        = collided pBounds (bounds object) && deadObject object

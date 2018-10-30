@@ -7,9 +7,13 @@ import HaskRunner.Core
 
 -- draw player and all objects currently on the screen
 drawLevel :: Level -> Picture
-drawLevel level = (drawPlayer (player level))
-  <> foldr ((<>) . drawObject) blank (levelMap level)
-  <> foldr ((<>) . drawObject) blank (edges level)
+drawLevel level
+    | isFinished level = drawGameOverScreen
+    | otherwise        = (drawPlayer (player level))
+      <> foldr ((<>) . drawObject) blank objectsOnScreen
+      <> foldr ((<>) . drawObject) blank (edges level)
+  where
+    objectsOnScreen = filter onScreen (levelMap level)
 
 -- draw player
 drawPlayer :: Player -> Picture
@@ -50,3 +54,7 @@ drawCircularObject bounds colour
         (diameter, _) = boundsWidthHeight bounds
         (Point centerX centerY) = boundsCenter bounds
         circ = translated centerX centerY (solidCircle (diameter / 2))
+
+drawGameOverScreen :: Picture
+drawGameOverScreen 
+  = scaled 2 2 (coloured black (lettering "Game Over!\nPress 'R' to restart"))
