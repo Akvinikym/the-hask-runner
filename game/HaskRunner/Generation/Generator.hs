@@ -9,9 +9,15 @@ type Seed = Double
 
 -- | TODO: take from Core
 verticalSpeed = 4
-screenHeight = 10
+screenHeight = 12
 initialSpeed = 2    
 acceleration = 0.2 
+playerHeight = 2.0
+meanNumberOfWalls = 30.0
+meanOriginOffset = 1.0
+baseOriginOffset = 3.0
+wallBase = 5.0
+meanWallLength = 1.0
 -- |
 
 -- Helper function for phi_inverse
@@ -83,19 +89,14 @@ getFeasibleRandomWalls s xOrigin = head $ dropWhile (not.isFeasible) (map (\s ->
 generateRandomWalls :: Int -> Double -> [GameObject]
 generateRandomWalls s xOrigin = zipWith3 makeWall platformXOrigins platformYOrigins platformLenghts
         where 
-            meanNumberOfWalls = 30.0
-            screenHeight = 50.0
-            meanOriginOffset = meanWallLength / 3.0
-            meanWallLength = 10.0
-            playerHeight = 2.0
             yLevels :: Int
-            yLevels = floor (screenHeight / (playerHeight * 4.0))
+            yLevels = 4
             normalRvs = map phi_inverse (randomRs (0.0, 1.0) (mkStdGen s))
             uniformRvs = randomRs (0, yLevels) (mkStdGen s)
             numberOfWalls = round (meanNumberOfWalls * (head normalRvs))
-            platformLenghts = map (meanWallLength *) (take numberOfWalls (drop 1 normalRvs))
-            platformYOrigins = map (\t -> (playerHeight * 4.0) * (fromIntegral t)) (take numberOfWalls uniformRvs)
-            platformXOrigins = scanl (+) xOrigin (map (meanOriginOffset * ) (take numberOfWalls (drop (1 + numberOfWalls) normalRvs)))
+            platformLenghts = map (\x -> x*meanWallLength + wallBase) (take numberOfWalls (drop 1 normalRvs))
+            platformYOrigins = map (\x -> (playerHeight * 4.0) * (fromIntegral x) - screenHeight) (take numberOfWalls uniformRvs)
+            platformXOrigins = scanl (+) xOrigin (map (\x -> baseOriginOffset + meanOriginOffset * x) (take numberOfWalls (drop (1 + numberOfWalls) normalRvs)))
 
 
 -- TODO insert this into generateRandomWalls
@@ -125,26 +126,6 @@ edgeExists inUp inDown outUp outDown = fromUpToDown || fromDownToUp
     fromDownToUp = not $ isNothing (intersectTrapBounds inDown outUp) 
 
      
-            
-    
--- -- Get zone, represented by 2 Pgrams, from every point of which player could
--- -- reach the wall passed
-getInPaths :: GameObject -> Bounds
-getInPaths w = Bounds 
-    (Point 2 (-4)) 
-    (Point 2 (-4)) 
-    (Point (3 + 10) (-6)) 
-    (Point (4 + 10) (-6))
-
--- -- Get zone, represented by 2 Pgrams, which shows every point player could reach
--- -- from this wall
-getOutPaths :: GameObject -> Bounds
-getOutPaths w = Bounds 
-    (Point 0 (-4)) 
-    (Point 0 (-4)) 
-    (Point (1 + 10) (-6)) 
-    (Point (1 + 10) (-6))
-
 -- This method should return difference from first bound along left side of second bound
 -- substractTrapBounds :: Bounds -> Bounds -> Maybe Bounds
 
