@@ -1,10 +1,9 @@
 module HaskRunner.Generation.Generator where
 
-import Data.Graph hiding (Bounds)
--- import Control.Monad
+import qualified Data.Graph as G
 import HaskRunner.Core
 import System.Random
--- import Data.Random
+import Data.Maybe
 type Seed = Double
 
 
@@ -16,10 +15,8 @@ rational_approx t = t - ((0.010328*t + 0.802853)*t + 2.515517) /
 
 -- Inverse of normal CDF
 phi_inverse :: Double -> Double
-phi_inverse p = 
-    if p < 0.5
-        then  - rational_approx( sqrt (-2.0*log(p)) )
-        else  rational_approx( sqrt (-2.0*log(1.0 - p)) )
+phi_inverse p | p < 0.5 = - rational_approx( sqrt (-2.0*log(p)))
+              | otherwise = rational_approx( sqrt (-2.0*log(1.0 - p)))
 
 -- {-|
 -- Generate infinite list if objects from random seed
@@ -29,9 +26,7 @@ phi_inverse p =
 -- -}
 objectGenerator :: Int -> [GameObject]
 objectGenerator s = foldr (++) [] (levelGenerator s)
-    where 
-        appendSafe = (++).(++ (safeZone x))
-        x = 10.0 -- TODO redo
+
 
 -- -- Objects at the start of the level
 -- TODO Change to lowest possible platform and top platform
@@ -90,19 +85,45 @@ generateRandomWalls s xOrigin = zipWith3 makeWall platformXOrigins platformYOrig
             platformXOrigins = scanl (+) xOrigin (map (meanOriginOffset * ) (take numberOfWalls (drop (1 + numberOfWalls) normalRvs)))
 
 
--- -- Generate graph with walls as vertices and paths inbetween as edges
--- makeGraph :: [GameObject] -> Graph
--- makeGraph walls = _
+-- TODO insert this into generateRandomWalls
+isFeasible :: [GameObject] -> Bool
+isFeasible = True
 
+-- Generate graph with walls as vertices and paths inbetween as edges
+makeGraph :: [GameObject] -> G.Graph
+makeGraph walls = G.buildG b edges
+    where
+        b = (1, (length walls))
+        inBounds = zip [1..] (map getInPaths walls)
+        outBounds = zip [1..] (map getOutPaths walls)
+        edges = catMaybes $ zipWith getEdges inBounds outBounds
+
+        getEdges :: (Int, Bounds) -> (Int, Bounds) -> Maybe (Int, Int)
+        getEdges (i, inB) (j, outB) | edgeExists inB outB = Just (i, j)
+                                    | otherwise = Nothing
+
+-- TODO add check for colliniearity
+edgeExists :: Bounds -> Bounds -> Bool
+edgeExists b b' = not (isNothing (intersectTrapBounds b b'))
+            
+    
 -- -- Get zone, represented by 2 Pgrams, from every point of which player could
 -- -- reach the wall passed
--- getInPaths :: GameObject -> [Bounds]
--- getInPaths w = _
+getInPaths :: GameObject -> Bounds
+getInPaths w = Bounds 
+    (Point 2 (-4)) 
+    (Point 2 (-4)) 
+    (Point (3 + 10) (-6)) 
+    (Point (4 + 10) (-6))
 
 -- -- Get zone, represented by 2 Pgrams, which shows every point player could reach
 -- -- from this wall
--- getOutPaths :: GameObject -> [Bounds]
--- getOutpaths w = _
+getOutPaths :: GameObject -> Bounds
+getOutPaths w = Bounds 
+    (Point 0 (-4)) 
+    (Point 0 (-4)) 
+    (Point (1 + 10) (-6)) 
+    (Point (1 + 10) (-6))
 
 -- This method should return difference from first bound along left side of second bound
 -- substractTrapBounds :: Bounds -> Bounds -> Maybe Bounds
@@ -153,6 +174,3 @@ calculateSpeed x = (horizontalSpeed, verticalSpeed)
 -- backwardGraphPass :: Graph -> [GameObject]
 -- backwardGraphPass g = _
 
--- -- Generate batch of gameObjects
--- batchGenerator :: Seed -> [GameObject]
--- batchGenerator s = _

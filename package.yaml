@@ -22,6 +22,7 @@ dependencies:
     - containers
     - random
     - random-fu
+    - algebraic-graphs
 
 default-extensions:
 - DuplicateRecordFields
