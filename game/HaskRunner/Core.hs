@@ -84,7 +84,7 @@ type Velocity = Double
 data GameObject = GameObject
     { bounds       :: Bounds
     , objectType   :: ObjectType
-    }
+    }  deriving (Show)  
 
 -- type of what can be generated
 data ObjectType =
@@ -92,7 +92,7 @@ data ObjectType =
     | Wall      -- ^ borders of the game
     | Spikes    -- ^ death-bringing obstacle
     | Coin      -- ^ source of additional points
-    deriving (Eq)
+    deriving (Eq, Show)
 
 -- if collision with object causes death
 deadObject :: GameObject -> Bool

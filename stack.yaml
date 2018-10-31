@@ -5,6 +5,7 @@ packages:
 
 extra-deps: 
 - codeworld-api-0.2.5
+- algebraic-graphs-0.2
 
 flags: {}
 
