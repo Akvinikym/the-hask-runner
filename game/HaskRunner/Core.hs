@@ -17,13 +17,14 @@ data Level = Level
     { player        :: Player     -- ^ player of the game
     , levelMap      :: Map        -- ^ collection of current game objects
     , edges         :: Map        -- ^ collection of game borders
+    , levelPos      :: Double     -- ^ position of the level screen
     , isFinished    :: Bool       -- ^ collision with obstacle occured
     , gravityIsDown :: Bool       -- ^ true, if gravity is upside-down
     , horVelocity   :: Velocity   -- ^ world's horizontal velocity
     , acceleration  :: Double     -- ^ current acceleration caused by the gravity
     , distance      :: Distance   -- ^ distance player travelled so far
     , lilcoins      :: Int        -- ^ number of coins player collected
-    }
+    } deriving (Show)
 
 
 -- player of the game
@@ -31,7 +32,7 @@ data Player = Player
   {  pbounds :: Bounds         -- ^ players position
   ,  pHorVelocity :: Velocity  -- ^ player's horizontal velocity
   ,  pVertVelocity :: Velocity -- ^ player's vertical velocity
-  }
+  } deriving (Show)
 
 
 -- rectangular bounds of the object
@@ -100,11 +101,11 @@ deadObject (GameObject _ objType)
     = objType == Wall || objType == Spikes
 
 -- find out, if the object is on the screen
-onScreen :: GameObject -> Bool
-onScreen obj
-    | leftMost < screenWidth && 
-      rightMost > (-screenWidth) = True
-    | otherwise                  = False
+onScreen :: Level -> GameObject -> Bool
+onScreen level obj
+    | leftMost < (screenWidth + (levelPos level)) && 
+      rightMost > (-screenWidth + (levelPos level)) = True
+    | otherwise                                     = False
   where
     (leftMost, rightMost) = boundsLeftRightCoords (bounds obj)
 

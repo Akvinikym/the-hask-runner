@@ -15,12 +15,13 @@ initialWorld :: Level
 initialWorld 
     = Level 
         initialPlayer 
-        (objectGenerator 45)
+        (objectGenerator 145)
         levelEdges 
+        100
         False 
         True 
         0.1
-        0 
+        0
         0 
         0
   where
@@ -42,10 +43,30 @@ initialWorld
             (Point 13 2)
             (Point 3 2)) Platform,
         GameObject (Bounds
-            (Point 15 (0))
-            (Point 17 (0))
-            (Point 17 (-2))
-            (Point 15 (-2))) Spikes]
+            (Point 11 (-4))
+            (Point 21 (-4))
+            (Point 21 (-6))
+            (Point 11 (-6))) Platform,
+        GameObject (Bounds
+            (Point 19 4)
+            (Point 29 4)
+            (Point 29 2)
+            (Point 19 2)) Platform,
+        GameObject (Bounds
+            (Point 27 (-4))
+            (Point 37 (-4))
+            (Point 37 (-6))
+            (Point 27 (-6))) Platform,
+        GameObject (Bounds
+            (Point 35 4)
+            (Point 45 4)
+            (Point 45 2)
+            (Point 35 2)) Platform]
+        -- GameObject (Bounds
+        --     (Point 15 (0))
+        --     (Point 17 (0))
+        --     (Point 17 (-2))
+        --     (Point 15 (-2))) Spikes]
         -- GameObject (Bounds
         --     (Point (-1) 1)
         --     (Point 1 1)
@@ -58,8 +79,7 @@ timingWorld dt level
     | otherwise        
         = playerDeath 
           . (increaseLevelVelocity dt) 
-          . movePlayer 
-          . moveObjects $ level
+          . movePlayer $ level
 
 eventsWorld :: Event -> Level -> Level
 eventsWorld (KeyPress "R") level

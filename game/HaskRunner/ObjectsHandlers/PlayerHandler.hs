@@ -16,14 +16,18 @@ movePlayer level
     vert = (acceleration level) + pVertVelocity (player level)
     (h, v) = collision 
       (pbounds (player level)) 
-      (map bounds (takeWhile onScreen (levelMap level)))
+      (map bounds objectsOnScreen)
       (hor, vert)
+    objectsOnScreen = takeWhile (onScreen level) 
+      (dropWhile (not . (onScreen level)) (levelMap level))
 
 -- find out, if the player dies, collided with some obstacle
 playerDied :: Level -> Bool
-playerDied (Level (Player pBounds _ _) objects _ _ _ _ _ _ _)
-    = any deadCollision onScreenObjects
+playerDied level = any deadCollision objectsOnScreen
   where
-    onScreenObjects = filter onScreen objects
+    (Level (Player pBounds _ _) objects _ _ _ _ _ _ _ _) = level
+    objectsOnScreen 
+        = takeWhile (onScreen level) 
+          (dropWhile (not . (onScreen level)) (levelMap level))
     deadCollision object 
         = collided pBounds (bounds object) && deadObject object
