@@ -3,9 +3,10 @@ module HaskRunner where
 import CodeWorld
 import HaskRunner.Core
 import HaskRunner.Graphics.Drawers
+import HaskRunner.Generation.Generator
+import HaskRunner.ObjectsHandlers.LevelHandler
 import HaskRunner.ObjectsHandlers.PlayerHandler
 import HaskRunner.ObjectsHandlers.GameObjectsHandler
-import HaskRunner.ObjectsHandlers.LevelHandler
 
 mainLoop :: IO ()
 mainLoop = interactionOf initialWorld timingWorld eventsWorld drawWorld
@@ -14,7 +15,7 @@ initialWorld :: Level
 initialWorld 
     = Level 
         initialPlayer 
-        exampleInitialObjects 
+        (objectGenerator 45)
         levelEdges 
         False 
         True 
@@ -24,10 +25,10 @@ initialWorld
         0
   where
     initialPlayer = Player (Bounds
-        (Point (-1) 1)
-        (Point 1 1)
-        (Point 1 (-1))
-        (Point (-1) (-1))) 0 (-0.5)
+        (Point (-1) 3)
+        (Point 1 3)
+        (Point 1 (1))
+        (Point (-1) (1))) 0 (-0.5)
 
     exampleInitialObjects = [
         GameObject (Bounds

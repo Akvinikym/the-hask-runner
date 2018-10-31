@@ -13,7 +13,7 @@ drawLevel level
       <> foldr ((<>) . drawObject) blank objectsOnScreen
       <> foldr ((<>) . drawObject) blank (edges level)
   where
-    objectsOnScreen = filter onScreen (levelMap level)
+    objectsOnScreen = takeWhile onScreen (levelMap level)
 
 -- draw player
 drawPlayer :: Player -> Picture

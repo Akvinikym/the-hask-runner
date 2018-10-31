@@ -6,7 +6,8 @@ import HaskRunner.Core
 
 -- move objects to left according to world's velocity
 moveObjects :: Level -> Level
-moveObjects level = level { levelMap = map moveObject objects }
+moveObjects level 
+    = level { levelMap = map moveObject (takeWhile onScreen objects) }
   where
     objects = levelMap level
     hVelocity = horVelocity level

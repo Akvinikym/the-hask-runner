@@ -32,15 +32,15 @@ objectGenerator s = foldr (++) [] (levelGenerator s)
 -- TODO Change to lowest possible platform and top platform
 safeZone :: Double -> [GameObject]
 safeZone xOrigin = [ GameObject (Bounds 
-        (Point xOrigin (-4)) 
-        (Point xOrigin (-4)) 
-        (Point (xOrigin + 10) (-6)) 
-        (Point (xOrigin + 10) (-6))) Platform,
+        (Point xOrigin (screenHeight + 2)) 
+        (Point xOrigin (screenHeight + 2)) 
+        (Point (xOrigin + 10) (screenHeight)) 
+        (Point (xOrigin + 10) (screenHeight))) Platform,
     GameObject (Bounds 
-        (Point xOrigin (-4)) 
-        (Point xOrigin (-4)) 
-        (Point (xOrigin + 10) (-6)) 
-        (Point (xOrigin + 10) (-6))) Platform ]
+        (Point xOrigin (-screenHeight)) 
+        (Point xOrigin (-screenHeight)) 
+        (Point (xOrigin + 10) (-screenHeight - 2)) 
+        (Point (xOrigin + 10) (-screenHeight - 2))) Platform ]
 
 -- Infinite list of gameObj batches
 levelGenerator :: Int -> [[GameObject]]
@@ -71,7 +71,6 @@ generateRandomWalls :: Int -> Double -> [GameObject]
 generateRandomWalls s xOrigin = zipWith3 makeWall platformXOrigins platformYOrigins platformLenghts
         where 
             meanNumberOfWalls = 30.0
-            screenHeight = 50.0
             meanOriginOffset = meanWallLength / 3.0
             meanWallLength = 10.0
             playerHeight = 2.0
@@ -81,13 +80,13 @@ generateRandomWalls s xOrigin = zipWith3 makeWall platformXOrigins platformYOrig
             uniformRvs = randomRs (0, yLevels) (mkStdGen s)
             numberOfWalls = round (meanNumberOfWalls * (head normalRvs))
             platformLenghts = map (meanWallLength *) (take numberOfWalls (drop 1 normalRvs))
-            platformYOrigins = map (\t -> (playerHeight * 4.0) * (fromIntegral t)) (take numberOfWalls uniformRvs)
+            platformYOrigins = map (\t -> (playerHeight * 4.0) * (fromIntegral t) - screenHeight) (take numberOfWalls uniformRvs)
             platformXOrigins = scanl (+) xOrigin (map (meanOriginOffset * ) (take numberOfWalls (drop (1 + numberOfWalls) normalRvs)))
 
 
 -- TODO insert this into generateRandomWalls
 isFeasible :: [GameObject] -> Bool
-isFeasible = True
+isFeasible _ = True
 
 -- Generate graph with walls as vertices and paths inbetween as edges
 makeGraph :: [GameObject] -> G.Graph

@@ -16,7 +16,7 @@ movePlayer level
     vert = (acceleration level) + pVertVelocity (player level)
     (h, v) = collision 
       (pbounds (player level)) 
-      (map bounds (levelMap level)) 
+      (map bounds (takeWhile onScreen (levelMap level)))
       (hor, vert)
 
 -- find out, if the player dies, collided with some obstacle
