@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 4b788782e4c797468074ea37ed2d6a748c75a182a9c5b6246bbc16738e47636a
+-- hash: 162260fa2aa637bf6f2fa7f3b6abd8f4592ddc5ca4816d673a379d0d29bb0345
 
 name:           the-hask-runner
 version:        0.1.0
@@ -40,8 +40,12 @@ library
   default-extensions: DuplicateRecordFields FlexibleContexts FlexibleInstances GeneralizedNewtypeDeriving LambdaCase NamedFieldPuns ScopedTypeVariables OverloadedStrings
   ghc-options: -Wall -fno-warn-type-defaults
   build-depends:
-      base >=4.7 && <5
+      algebraic-graphs
+    , base >=4.7 && <5
     , codeworld-api
+    , containers
+    , random
+    , random-fu
   default-language: Haskell2010
 
 executable the-hask-runner
@@ -53,7 +57,11 @@ executable the-hask-runner
   default-extensions: DuplicateRecordFields FlexibleContexts FlexibleInstances GeneralizedNewtypeDeriving LambdaCase NamedFieldPuns ScopedTypeVariables OverloadedStrings
   ghc-options: -Wall -fno-warn-type-defaults -rtsopts -threaded -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      algebraic-graphs
+    , base >=4.7 && <5
     , codeworld-api
+    , containers
+    , random
+    , random-fu
     , the-hask-runner
   default-language: Haskell2010

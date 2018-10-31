@@ -63,11 +63,11 @@ type Velocity = Double
 data GameObject = GameObject 
     { bounds       :: Bounds
     , objectType   :: ObjectType
-    } 
+    }  deriving (Show)  
 
 -- type of what can be generated
 data ObjectType = 
     Platform    -- ^ rectangular platform, on which player can stand
     | Wall 
     | Spikes 
-    | Coin
+    | Coin deriving (Show)  
