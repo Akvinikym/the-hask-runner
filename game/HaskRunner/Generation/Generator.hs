@@ -9,9 +9,8 @@ type Seed = Double
 
 -- | TODO: take from Core
 verticalSpeed = 4
-screenHeight = 12
-initialSpeed = 2    
-acceleration = 0.2 
+-- screenHeight = 12
+initialSpeed = 2
 playerHeight = 2.0
 meanNumberOfWalls = 30.0
 meanOriginOffset = 1.0
@@ -158,7 +157,7 @@ intersectTrapBounds b b' = b''
 getHorizontalSpeed :: Double -> Double
 getHorizontalSpeed x = horizontalSpeed
     where
-        horizontalSpeed = x / timeFromX(acceleration / 2, initialSpeed, x)
+        horizontalSpeed = x / timeFromX(horizontalAcceleration / 2, initialSpeed, x)
         timeFromX (a, b, c) = t1
             where
                 e = -b * (2 * a)
@@ -177,7 +176,7 @@ getIncomingTrapezoids (GameObject bound _) = (getIncomingUpperBound (topLeft bou
         getIncomingUpperBoundPoint (Point x y) = (Point (calculateIncomingBoundXPoint x (screenHeight - y)) screenHeight)
         getIncomingLowerBound leftPoint rightPoint = Bounds (getIncomingLowerBoundPoint leftPoint) (getIncomingLowerBoundPoint rightPoint) rightPoint leftPoint
         getIncomingLowerBoundPoint (Point x y) = (Point (calculateIncomingBoundXPoint x y) 0)
-        calculateIncomingBoundXPoint x dY = x - getHorizontalSpeed (x - time) * time - 0.5 * acceleration * (time ^ 2)
+        calculateIncomingBoundXPoint x dY = x - getHorizontalSpeed (x - time) * time - 0.5 * horizontalAcceleration * (time ^ 2)
             where
                 time = dY / verticalSpeed
 
@@ -189,7 +188,7 @@ getOutcomingTrapezoids (GameObject bound _) = (getOutcomingUpperBound (topLeft b
             getOutcomingUpperBoundPoint (Point x y) = (Point (calculateOutcomingBoundXPoint x (screenHeight - y)) screenHeight)
             getOutcomingLowerBound leftPoint rightPoint = Bounds leftPoint rightPoint (getOutcomingLowerBoundPoint rightPoint) (getOutcomingLowerBoundPoint leftPoint)
             getOutcomingLowerBoundPoint (Point x y) = (Point (calculateOutcomingBoundXPoint x y) 0)
-            calculateOutcomingBoundXPoint x dY = x + getHorizontalSpeed x * time + 0.5 * acceleration * (time ^ 2)
+            calculateOutcomingBoundXPoint x dY = x + getHorizontalSpeed x * time + 0.5 * horizontalAcceleration * (time ^ 2)
                 where
                     time = dY / verticalSpeed
 
