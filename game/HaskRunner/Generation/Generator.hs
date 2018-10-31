@@ -1,12 +1,23 @@
 module HaskRunner.Generation.Generator where
 
 import qualified Data.Graph as G
+import Control.Monad
 import HaskRunner.Core
 import System.Random
 import Data.Maybe
 type Seed = Double
 
-
+-- | TODO: take from Core
+verticalSpeed = 4
+-- screenHeight = 12
+initialSpeed = 2
+playerHeight = 2.0
+meanNumberOfWalls = 30.0
+meanOriginOffset = 1.0
+baseOriginOffset = 3.0
+wallBase = 5.0
+meanWallLength = 1.0
+-- |
 
 -- Helper function for phi_inverse
 rational_approx :: Double -> Double
@@ -32,19 +43,19 @@ objectGenerator s = foldr (++) [] (levelGenerator s)
 -- TODO Change to lowest possible platform and top platform
 safeZone :: Double -> [GameObject]
 safeZone xOrigin = [ GameObject (Bounds 
-        (Point xOrigin (-4)) 
-        (Point xOrigin (-4)) 
-        (Point (xOrigin + 10) (-6)) 
-        (Point (xOrigin + 10) (-6))) Platform,
+        (Point xOrigin (screenHeight + 2)) 
+        (Point xOrigin (screenHeight + 2)) 
+        (Point (xOrigin + 10) (screenHeight)) 
+        (Point (xOrigin + 10) (screenHeight))) Platform,
     GameObject (Bounds 
-        (Point xOrigin (-4)) 
-        (Point xOrigin (-4)) 
-        (Point (xOrigin + 10) (-6)) 
-        (Point (xOrigin + 10) (-6))) Platform ]
+        (Point xOrigin (-screenHeight)) 
+        (Point xOrigin (-screenHeight)) 
+        (Point (xOrigin + 10) (-screenHeight - 2)) 
+        (Point (xOrigin + 10) (-screenHeight - 2))) Platform ]
 
 -- Infinite list of gameObj batches
 levelGenerator :: Int -> [[GameObject]]
-levelGenerator s = scanl getNextXOrigin (safeZone 0.0) (map generateRandomWalls seedRvs)
+levelGenerator s = scanl getNextXOrigin (safeZone 0.0) (map getFeasibleRandomWalls seedRvs)
     where 
         g = mkStdGen s
         seedRvs =  (randoms g :: [Int])
@@ -63,6 +74,13 @@ makeWall x y l = GameObject bounds Platform
         p3 = Point (x + l) (y - platformHeight)
         p4 = Point x (y - platformHeight)
 
+
+getFeasibleRandomWalls :: Int -> Double -> [GameObject]
+getFeasibleRandomWalls s xOrigin = head $ dropWhile (not.isFeasible) (map (\s -> generateRandomWalls s xOrigin) seeds)
+        where
+            g = mkStdGen s
+            seeds =  (randoms g :: [Int])
+
 -- -- Randomly generate walls
 -- --  1. Consider player size (Done)
 -- --  2. Consider player speed (?)
@@ -70,61 +88,43 @@ makeWall x y l = GameObject bounds Platform
 generateRandomWalls :: Int -> Double -> [GameObject]
 generateRandomWalls s xOrigin = zipWith3 makeWall platformXOrigins platformYOrigins platformLenghts
         where 
-            meanNumberOfWalls = 30.0
-            screenHeight = 50.0
-            meanOriginOffset = meanWallLength / 3.0
-            meanWallLength = 10.0
-            playerHeight = 2.0
             yLevels :: Int
-            yLevels = floor (screenHeight / (playerHeight * 4.0))
+            yLevels = 4
             normalRvs = map phi_inverse (randomRs (0.0, 1.0) (mkStdGen s))
             uniformRvs = randomRs (0, yLevels) (mkStdGen s)
             numberOfWalls = round (meanNumberOfWalls * (head normalRvs))
-            platformLenghts = map (meanWallLength *) (take numberOfWalls (drop 1 normalRvs))
-            platformYOrigins = map (\t -> (playerHeight * 4.0) * (fromIntegral t)) (take numberOfWalls uniformRvs)
-            platformXOrigins = scanl (+) xOrigin (map (meanOriginOffset * ) (take numberOfWalls (drop (1 + numberOfWalls) normalRvs)))
+            platformLenghts = map (\x -> x*meanWallLength + wallBase) (take numberOfWalls (drop 1 normalRvs))
+            platformYOrigins = map (\x -> (playerHeight * 4.0) * (fromIntegral x) - screenHeight) (take numberOfWalls uniformRvs)
+            platformXOrigins = scanl (+) xOrigin (map (\x -> baseOriginOffset + meanOriginOffset * x) (take numberOfWalls (drop (1 + numberOfWalls) normalRvs)))
 
 
 -- TODO insert this into generateRandomWalls
 isFeasible :: [GameObject] -> Bool
-isFeasible = True
+isFeasible gs = not (null gs) && G.path (makeGraph gs) 1 (length gs)
+
 
 -- Generate graph with walls as vertices and paths inbetween as edges
 makeGraph :: [GameObject] -> G.Graph
 makeGraph walls = G.buildG b edges
     where
         b = (1, (length walls))
-        inBounds = zip [1..] (map getInPaths walls)
-        outBounds = zip [1..] (map getOutPaths walls)
-        edges = catMaybes $ zipWith getEdges inBounds outBounds
+        inBounds = zip [1..] (map getIncomingTrapezoids walls)
+        outBounds = zip [1..] (map getOutcomingTrapezoids walls)
+        allBounds = unzip [(inB, outB) | inB <- inBounds, outB <- outBounds]
+        edges = catMaybes $ zipWith getEdges  (fst allBounds)  (snd allBounds)
+        
+        getEdges :: (Int, (Bounds, Bounds)) -> (Int, (Bounds, Bounds)) -> Maybe (Int, Int)
+        getEdges (i, (inBup, inBdown)) (j, (outBup, outBdown)) | edgeExists inBup inBdown outBup outBdown = Just (i, j)
+                                                               | otherwise = Nothing
 
-        getEdges :: (Int, Bounds) -> (Int, Bounds) -> Maybe (Int, Int)
-        getEdges (i, inB) (j, outB) | edgeExists inB outB = Just (i, j)
-                                    | otherwise = Nothing
+-- TODO add check for player sizes
+edgeExists :: Bounds -> Bounds -> Bounds -> Bounds -> Bool
+edgeExists inUp inDown outUp outDown = fromUpToDown || fromDownToUp
+    where
+    fromUpToDown = not $ isNothing (intersectTrapBounds inUp outDown) 
+    fromDownToUp = not $ isNothing (intersectTrapBounds inDown outUp) 
 
--- TODO add check for colliniearity
-edgeExists :: Bounds -> Bounds -> Bool
-edgeExists b b' = not (isNothing (intersectTrapBounds b b'))
-            
-    
--- -- Get zone, represented by 2 Pgrams, from every point of which player could
--- -- reach the wall passed
-getInPaths :: GameObject -> Bounds
-getInPaths w = Bounds 
-    (Point 2 (-4)) 
-    (Point 2 (-4)) 
-    (Point (3 + 10) (-6)) 
-    (Point (4 + 10) (-6))
-
--- -- Get zone, represented by 2 Pgrams, which shows every point player could reach
--- -- from this wall
-getOutPaths :: GameObject -> Bounds
-getOutPaths w = Bounds 
-    (Point 0 (-4)) 
-    (Point 0 (-4)) 
-    (Point (1 + 10) (-6)) 
-    (Point (1 + 10) (-6))
-
+     
 -- This method should return difference from first bound along left side of second bound
 -- substractTrapBounds :: Bounds -> Bounds -> Maybe Bounds
 
@@ -147,24 +147,51 @@ intersectTrapBounds b b' = b''
         y3'' = y_low
         b'' = if isCollinear then Nothing else Just $ Bounds (Point x1'' y1'') (Point x2 y2) (Point x3'' y3'') (Point x4' y4') 
 
--- Get player horizontal and vertical speed from distance passed
-calculateSpeed :: Double -> (Double, Double)
-calculateSpeed x = (horizontalSpeed, verticalSpeed)
+-- -- Get player horizontal and vertical speed from distance passed
+-- calculateSpeed :: Double -> (Double, Double)
+-- calculateSpeed x = (getHorizontalSpeed x, verticalSpeed)
+--     where
+--         verticalSpeed = 4   -- TODO: take from Core
+
+-- Get horizaontal speed based on player current position        
+getHorizontalSpeed :: Double -> Double
+getHorizontalSpeed x = horizontalSpeed
     where
-        initialSpeed = 2    -- TODO: take from Core
-        acceleration = 0.2  -- TODO: take from Core
-        verticalSpeed = 4   -- TODO: take from Core
-        horizontalSpeed = x / timeFromX(acceleration / 2, initialSpeed, x)
+        horizontalSpeed = x / timeFromX(horizontalAcceleration / 2, initialSpeed, x)
         timeFromX (a, b, c) = t1
             where
                 e = -b * (2 * a)
                 d = b * b - 4 * a * (-c)
                 t1 = e + sqrt (d / (2 * a))
-        
-                
--- -- Check whether player can reach second wall from first wall
+
+-- Check whether player can reach second wall from first wall
 -- checkIntersection :: GameObject -> GameObject -> Bool
 -- checkIntersection w w' = _
+
+-- Obtain incoming trapezoids for wall
+getIncomingTrapezoids :: GameObject -> (Bounds, Bounds)
+getIncomingTrapezoids (GameObject bound _) = (getIncomingUpperBound (topLeft bound) (topRight bound), getIncomingLowerBound (bottomLeft bound) (bottomRight bound))
+    where
+        getIncomingUpperBound leftPoint rightPoint = Bounds (getIncomingUpperBoundPoint leftPoint) (getIncomingUpperBoundPoint rightPoint) rightPoint leftPoint
+        getIncomingUpperBoundPoint (Point x y) = (Point (calculateIncomingBoundXPoint x (screenHeight - y)) screenHeight)
+        getIncomingLowerBound leftPoint rightPoint = Bounds (getIncomingLowerBoundPoint leftPoint) (getIncomingLowerBoundPoint rightPoint) rightPoint leftPoint
+        getIncomingLowerBoundPoint (Point x y) = (Point (calculateIncomingBoundXPoint x y) 0)
+        calculateIncomingBoundXPoint x dY = x - getHorizontalSpeed (x - time) * time - 0.5 * horizontalAcceleration * (time ^ 2)
+            where
+                time = dY / verticalSpeed
+
+-- Obtain outcoming trapezoids for wall
+getOutcomingTrapezoids :: GameObject -> (Bounds, Bounds)
+getOutcomingTrapezoids (GameObject bound _) = (getOutcomingUpperBound (topLeft bound) (topRight bound),  getOutcomingLowerBound (bottomLeft bound) (bottomRight bound))
+        where
+            getOutcomingUpperBound leftPoint rightPoint = Bounds (getOutcomingUpperBoundPoint leftPoint) (getOutcomingUpperBoundPoint rightPoint) rightPoint leftPoint
+            getOutcomingUpperBoundPoint (Point x y) = (Point (calculateOutcomingBoundXPoint x (screenHeight - y)) screenHeight)
+            getOutcomingLowerBound leftPoint rightPoint = Bounds leftPoint rightPoint (getOutcomingLowerBoundPoint rightPoint) (getOutcomingLowerBoundPoint leftPoint)
+            getOutcomingLowerBoundPoint (Point x y) = (Point (calculateOutcomingBoundXPoint x y) 0)
+            calculateOutcomingBoundXPoint x dY = x + getHorizontalSpeed x * time + 0.5 * horizontalAcceleration * (time ^ 2)
+                where
+                    time = dY / verticalSpeed
+
 
 -- -- Check if graph contains feasible route from start to end
 -- checkGraph :: Graph -> Bool
