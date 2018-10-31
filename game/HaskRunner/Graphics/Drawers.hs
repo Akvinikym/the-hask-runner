@@ -43,9 +43,7 @@ drawTriangularObject bounds colour
     = coloured colour triangle
       where
         (Bounds (Point x1 y1) _ (Point x3 y3) (Point x4 y4)) = bounds
-        (Point centerX centerY) = boundsCenter bounds
-        triangle = translated centerX centerY
-          (solidPolygon [((x1 + x3) / 2, y1), (x3, y3), (x4, y4)])
+        triangle = solidPolygon [((x1 + x3) / 2, y1), (x3, y3), (x4, y4)]
 
 drawCircularObject :: Bounds -> Colour -> Picture
 drawCircularObject bounds colour
