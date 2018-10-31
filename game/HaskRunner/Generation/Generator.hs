@@ -27,19 +27,35 @@ phi_inverse p =
 --     drawGame :: Game -> Picture
 --     drawGame = drawObjects . objectGenerator
 -- -}
--- objectGenerator :: Seed -> [GameObject]
--- objectGenerator _ = startObjects ++ []
+objectGenerator :: Int -> [GameObject]
+objectGenerator s = foldr (++) [] (levelGenerator s)
+    where 
+        appendSafe = (++).(++ (safeZone x))
+        x = 10.0 -- TODO redo
 
 -- -- Objects at the start of the level
--- startObjects :: [GameObject]
--- startObjects = []
+-- TODO Change to lowest possible platform and top platform
+safeZone :: Double -> [GameObject]
+safeZone xOrigin = [ GameObject (Bounds 
+        (Point xOrigin (-4)) 
+        (Point xOrigin (-4)) 
+        (Point (xOrigin + 10) (-6)) 
+        (Point (xOrigin + 10) (-6))) Platform,
+    GameObject (Bounds 
+        (Point xOrigin (-4)) 
+        (Point xOrigin (-4)) 
+        (Point (xOrigin + 10) (-6)) 
+        (Point (xOrigin + 10) (-6))) Platform ]
 
 -- Infinite list of gameObj batches
 levelGenerator :: Int -> [[GameObject]]
-levelGenerator s = map generateRandomWalls seedRvs
+levelGenerator s = scanl getNextXOrigin (safeZone 0.0) (map generateRandomWalls seedRvs)
     where 
         g = mkStdGen s
         seedRvs =  (randoms g :: [Int])
+        getNextXOrigin prev next =  (safeZone x) ++ next (x + 10.0)
+            where
+               Point x _ = (topRight (bounds (last prev)))
 
 platformHeight = 1.1
 
@@ -56,8 +72,8 @@ makeWall x y l = GameObject bounds Platform
 -- --  1. Consider player size (Done)
 -- --  2. Consider player speed (?)
 -- --  3. Consider previous walls (?) (min delta between walls)
-generateRandomWalls :: Int -> [GameObject]
-generateRandomWalls s = zipWith3 makeWall platformXOrigins platformYOrigins platformLenghts
+generateRandomWalls :: Int -> Double -> [GameObject]
+generateRandomWalls s xOrigin = zipWith3 makeWall platformXOrigins platformYOrigins platformLenghts
         where 
             meanNumberOfWalls = 30.0
             screenHeight = 50.0
@@ -71,7 +87,7 @@ generateRandomWalls s = zipWith3 makeWall platformXOrigins platformYOrigins plat
             numberOfWalls = round (meanNumberOfWalls * (head normalRvs))
             platformLenghts = map (meanWallLength *) (take numberOfWalls (drop 1 normalRvs))
             platformYOrigins = map (\t -> (playerHeight * 4.0) * (fromIntegral t)) (take numberOfWalls uniformRvs)
-            platformXOrigins = scanl (+) 0 (map (meanOriginOffset * ) (take numberOfWalls (drop (1 + numberOfWalls) normalRvs)))
+            platformXOrigins = scanl (+) xOrigin (map (meanOriginOffset * ) (take numberOfWalls (drop (1 + numberOfWalls) normalRvs)))
 
 
 -- -- Generate graph with walls as vertices and paths inbetween as edges
