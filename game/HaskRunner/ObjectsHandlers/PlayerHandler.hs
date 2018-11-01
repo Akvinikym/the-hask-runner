@@ -42,6 +42,7 @@ playerDied level = any deadCollision objectsOnScreen
     deadCollision object
         = collided pBounds (bounds object) && deadObject object
 
+-- add points if player has picked up any coins and remove these coins from the game
 checkCoins :: Level -> Level
 checkCoins level = level {lilcoins = coins, levelMap = lmap}
   where
