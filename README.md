@@ -3,7 +3,7 @@
 ## Overview
 
 This is a simple platformer game where you have to navigate you cube through various obstacles.
-The only thing you control in this game is gravity direction. Try to survive as long as possible.
+The only thing you control in this game is gravity direction. Try to survive for as long as possible.
 
 ## Controls
 
