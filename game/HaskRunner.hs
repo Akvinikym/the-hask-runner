@@ -28,7 +28,7 @@ initialWorld
         (Point (-1) 3)
         (Point 1 3)
         (Point 1 (1))
-        (Point (-1) (1))) 0 (-0.5)
+        (Point (-1) (1))) 0 0
 
     exampleInitialObjects = [
         GameObject (Bounds

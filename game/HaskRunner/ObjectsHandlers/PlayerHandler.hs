@@ -19,12 +19,12 @@ movePlayer level
     vert = pVertVelocity (player level)
     (h, v) = adjustVelocity
       worldVel
-      baseGravity
+      currentGravity
       (map bounds objectsOnScreen)
       (pbounds (player level))
       (hor, vert)
     objectsOnScreen = takeWhile (onScreen level)
-      (dropWhile (not . (onScreen level)) (levelMap level))
+      (dropWhile (not . (onScreen level)) (levelMap level)) <> edges level
 
 -- find out, if the player dies, collided with some obstacle
 playerDied :: Level -> Bool
@@ -33,6 +33,6 @@ playerDied level = any deadCollision objectsOnScreen
     (Level (Player pBounds _ _) objects _ _ _ _ _ _ _) = level
     objectsOnScreen
         = takeWhile (onScreen level)
-          (dropWhile (not . (onScreen level)) (levelMap level))
+          (dropWhile (not . (onScreen level)) (levelMap level)) <> edges level
     deadCollision object
         = collided pBounds (bounds object) && deadObject object
