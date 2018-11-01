@@ -134,4 +134,4 @@ levelEdges = [bottomWall, leftWall, upWall]
         (Point (- screenWidth + 1) (screenHeight - 3))) Wall
 
 gameScore :: Level -> Integer
-gameScore level = floor (levelPos level) - 100
+gameScore level = toInteger ((floor (levelPos level)) - 100 + (100 * (lilcoins level)))
