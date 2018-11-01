@@ -5,10 +5,11 @@ module HaskRunner.ObjectsHandlers.GameObjectsHandler where
 import HaskRunner.Core
 
 -- move objects to left according to world's velocity
-moveObjects :: Level -> Level
-moveObjects level = level { levelMap = map moveObject objects }
-  where
-    objects = levelMap level
-    hVelocity = horVelocity level
-    moveObject obj 
-      = obj { bounds = moveBounds (bounds obj) ((- hVelocity), 0) }
+-- moveObjects :: Level -> Level
+-- moveObjects level 
+--     = level { levelMap = map moveObject (takeWhile onScreen objects) }
+--   where
+--     objects = levelMap level
+--     hVelocity = horVelocity level
+--     moveObject obj 
+--       = obj { bounds = moveBounds (bounds obj) ((- hVelocity), 0) }

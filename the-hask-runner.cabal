@@ -1,8 +1,10 @@
--- This file has been generated from package.yaml by hpack version 0.28.2.
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.31.0.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 06e5607cb2dcc813dbcbc914d952ea1687a4d0474632843b2cbb5ddb044ebf7d
+-- hash: 10e82c7b9a141db97003f2c7caaf0767270772e45fbe1f42e3e756235d5ebfb5
 
 name:           the-hask-runner
 version:        0.1.0
@@ -16,7 +18,6 @@ copyright:      2018 PONY
 license:        Apache-2.0
 license-file:   LICENSE
 build-type:     Simple
-cabal-version:  >= 1.10
 extra-source-files:
     package.yaml
     README.md
@@ -43,8 +44,12 @@ library
   default-extensions: DuplicateRecordFields FlexibleContexts FlexibleInstances GeneralizedNewtypeDeriving LambdaCase NamedFieldPuns ScopedTypeVariables OverloadedStrings
   ghc-options: -Wall -fno-warn-type-defaults
   build-depends:
-      base >=4.7 && <5
+      algebraic-graphs
+    , base >=4.7 && <5
     , codeworld-api
+    , containers
+    , random
+    , random-fu
   default-language: Haskell2010
 
 executable the-hask-runner
@@ -56,7 +61,11 @@ executable the-hask-runner
   default-extensions: DuplicateRecordFields FlexibleContexts FlexibleInstances GeneralizedNewtypeDeriving LambdaCase NamedFieldPuns ScopedTypeVariables OverloadedStrings
   ghc-options: -Wall -fno-warn-type-defaults -rtsopts -threaded -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      algebraic-graphs
+    , base >=4.7 && <5
     , codeworld-api
+    , containers
+    , random
+    , random-fu
     , the-hask-runner
   default-language: Haskell2010

@@ -7,7 +7,10 @@ import HaskRunner.ObjectsHandlers.PlayerHandler
 
 -- increase level's velocity based on time from the last frame
 increaseLevelVelocity :: Double -> Level -> Level
-increaseLevelVelocity dt level = level { horVelocity = newVelocity }
+increaseLevelVelocity dt level = level { 
+    horVelocity = newVelocity,
+    levelPos = newVelocity + (levelPos level)
+  }
   where
     newVelocity = (horVelocity level) + dt * horizontalAcceleration
 

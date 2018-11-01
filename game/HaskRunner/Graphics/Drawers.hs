@@ -10,25 +10,27 @@ drawLevel :: Level -> Picture
 drawLevel level
     | isFinished level = drawGameOverScreen
     | otherwise        = (drawPlayer (player level))
-      <> foldr ((<>) . drawObject) blank objectsOnScreen
-      <> foldr ((<>) . drawObject) blank (edges level)
+      <> foldr ((<>) . drawObject (levelPos level)) blank objectsOnScreen
+      <> foldr ((<>) . drawObject 0) blank (edges level)
   where
-    objectsOnScreen = filter onScreen (levelMap level)
+    objectsOnScreen 
+        = takeWhile (onScreen level) 
+          (dropWhile (not . (onScreen level)) (levelMap level))
 
 -- draw player
 drawPlayer :: Player -> Picture
 drawPlayer player = drawRectangularObject (pbounds player) green
 
 -- draw a game object
-drawObject :: GameObject -> Picture
-drawObject (GameObject bounds Platform)
-    = drawRectangularObject bounds brown
-drawObject (GameObject bounds Wall)
-    = drawRectangularObject bounds (darker 0.5 brown)
-drawObject (GameObject bounds Spikes)
-    = drawTriangularObject bounds red
-drawObject (GameObject bounds Coin)
-    = drawCircularObject bounds yellow
+drawObject :: Double -> GameObject -> Picture
+drawObject offset (GameObject bounds Platform)
+    = translated (-offset) 0 (drawRectangularObject bounds brown)
+drawObject offset (GameObject bounds Wall)
+    = translated (-offset) 0 (drawRectangularObject bounds (darker 0.5 brown))
+drawObject offset (GameObject bounds Spikes)
+    = translated (-offset) 0 (drawTriangularObject bounds red)
+drawObject offset (GameObject bounds Coin)
+    = translated (-offset) 0 (drawCircularObject bounds yellow)
 
 drawRectangularObject :: Bounds -> Colour -> Picture
 drawRectangularObject bounds colour
@@ -43,9 +45,7 @@ drawTriangularObject bounds colour
     = coloured colour triangle
       where
         (Bounds (Point x1 y1) _ (Point x3 y3) (Point x4 y4)) = bounds
-        (Point centerX centerY) = boundsCenter bounds
-        triangle = translated centerX centerY
-          (solidPolygon [((x1 + x3) / 2, y1), (x3, y3), (x4, y4)])
+        triangle = solidPolygon [((x1 + x3) / 2, y1), (x3, y3), (x4, y4)]
 
 drawCircularObject :: Bounds -> Colour -> Picture
 drawCircularObject bounds colour
