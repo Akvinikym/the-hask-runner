@@ -13,14 +13,14 @@ adjustVelocity :: Double
                -> (Velocity, Velocity)
 adjustVelocity worldVel gravity objects player (hor, ver) = (adjustHor hCollisions, adjustVert vCollisions)
   where
-    newHor = 0
+    newHor = if hor == 0 then 0 + horizontalAcceleration else 0
     newVert = ver + gravity
     hCollisions = hcollisions player objects newHor
     vCollisions = vcollisions player objects newVert
-    adjustVert True = 0
-    adjustVert False = newVert
+    adjustVert True = if hCollisions then newVert else 0
+    adjustVert _ = newVert
     adjustHor True = -worldVel
-    adjustHor False = newHor
+    adjustHor _ = 0
 
 -- detect if any horizontal motion causes collision
 hcollisions :: Bounds -> [Bounds] -> Double -> Bool
@@ -39,11 +39,11 @@ collided :: Bounds -> Bounds -> Bool
 collided o1 o2 = collidedX && collidedY
   where
     collidedX
-      = x (bottomRight o1) >= x (topLeft o2) &&
-        x (bottomRight o2) >= x (topLeft o1)
+      = x (bottomRight o1) > x (topLeft o2) &&
+        x (bottomRight o2) > x (topLeft o1)
     collidedY
-      = y (bottomRight o1) <= y (topLeft o2) &&
-        y (bottomRight o2) <= y (topLeft o1)
+      = y (bottomRight o1) < y (topLeft o2) &&
+        y (bottomRight o2) < y (topLeft o1)
     x (Point c1 _) = c1
     y (Point _ c2) = c2
 

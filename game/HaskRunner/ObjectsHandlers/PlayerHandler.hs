@@ -18,7 +18,6 @@ movePlayer level
     playerBounds = pbounds (player level)
     currentAbsPos = absolutePosition (levelPos level) playerBounds
     currentGravity = adjustGravity (gravityIsDown level) baseGravity
-    levelObjects = map bounds (levelMap level ++ (edges level))
     worldVel = horVelocity level
     hor = pHorVelocity (player level)
     vert = pVertVelocity (player level)
