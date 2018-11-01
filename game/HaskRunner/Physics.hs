@@ -2,92 +2,52 @@ module HaskRunner.Physics where
 
 import HaskRunner.Core
 
--- updates the velocities based on whether or not collision happened
-collision :: Bounds 
-  -> [Bounds] 
-  -> (Velocity, Velocity) 
-  -> (Velocity, Velocity)
-collision object otherObjects (h, v) = (newHor, newVert)
+-- Adjust velocity based on gravity and bounds
+-- moves object based on speed
+-- then sees if it is possible to move in that position
+adjustVelocity :: Double
+               -> Double
+               -> [Bounds]
+               -> Bounds
+               -> (Velocity, Velocity)
+               -> (Velocity, Velocity)
+adjustVelocity worldVel gravity objects player (hor, ver) = (adjustHor hCollisions, adjustVert vCollisions)
   where
-    hasCollided = collisionHappened otherObjects object
-    (newHor, newVert) 
-      = adjustVelocity (collisionType oldObject object hasCollided) (h, v)
-    -- approximate old position
-    oldObject = moveBounds object ((-h), (-v))
+    newHor = if hor == 0 then 0 + horizontalAcceleration else 0
+    newVert = ver + gravity
+    hCollisions = hcollisions player objects newHor
+    vCollisions = vcollisions player objects newVert
+    adjustVert True = if hCollisions then newVert else 0
+    adjustVert _ = newVert
+    adjustHor True = -worldVel
+    adjustHor _ = 0
 
--- check if collision occured, and return all objects for which it happened
-collisionHappened :: [Bounds] -> Bounds -> [Bounds]
-collisionHappened objects object = collidingObjects
+-- detect if any horizontal motion causes collision
+hcollisions :: Bounds -> [Bounds] -> Double -> Bool
+hcollisions object objects vel = any (collided newObj) objects
   where
-    collidingObjects = filter (collided object) objects
+    newObj = moveBounds object (vel, 0)
+
+-- detect if any vertical motion causes collision
+vcollisions :: Bounds -> [Bounds] -> Double -> Bool
+vcollisions object objects vel = any (collided newObj) objects
+  where
+    newObj = moveBounds object (0, vel)
 
 -- AABB collision
 collided :: Bounds -> Bounds -> Bool
 collided o1 o2 = collidedX && collidedY
   where
     collidedX
-      = x (bottomRight o1) >= x (topLeft o2) && 
-        x (bottomRight o2) >= x (topLeft o1)
+      = x (bottomRight o1) > x (topLeft o2) &&
+        x (bottomRight o2) > x (topLeft o1)
     collidedY
-      = y (bottomRight o1) <= y (topLeft o2) && 
-        y (bottomRight o2) <= y (topLeft o1)
+      = y (bottomRight o1) < y (topLeft o2) &&
+        y (bottomRight o2) < y (topLeft o1)
     x (Point c1 _) = c1
     y (Point _ c2) = c2
 
--- return all collision directions which occured with the object
-collisionType :: Bounds -> Bounds -> [Bounds] -> [CollisionType]
-collisionType _ _ [] = []
-collisionType oldObj obj (bound:bounds) = collisions ++ 
-    (collisionType oldObj obj bounds)
-  where
-    collisions
-      | collidedFromLeft = [CLeft]
-      | collidedFromRight = [CRight]
-      | collidedFromTop = [CUp]
-      | collidedFromBottom = [CDown]
-      | otherwise = []
-    collidedFromLeft
-      = right oldObj < left bound && right obj >= left bound
-    collidedFromRight
-      = left oldObj >= right bound && left obj < right bound
-    collidedFromTop
-      = bottom oldObj > top bound && bottom obj <= top bound
-    collidedFromBottom
-      = top oldObj < bottom bound && top obj >= bottom bound
-    left = x . topLeft
-    right = x . bottomRight
-    top = y . topLeft
-    bottom = y . bottomRight
-    x (Point c1 _) = c1
-    y (Point _ c2) = c2
+adjustGravity :: Bool-> Double -> Double
+adjustGravity True base  = base
+adjustGravity False base = -base
 
--- CollisionType shows from which side object crossed other object:
--- It is calculated relative to nonmoving object
-data CollisionType = CUp | CDown | CLeft | CRight
-
--- adjust velocity according to collision types
-adjustVelocity :: [CollisionType] 
-  -> (Velocity, Velocity) 
-  -> (Velocity, Velocity)
-adjustVelocity [] velocity = velocity
-adjustVelocity (collision:collisions) velocity
-  = adjustSingleCollision collision velocity `join` 
-    adjustVelocity collisions velocity
-
-adjustSingleCollision :: CollisionType
-  -> (Velocity, Velocity) 
-  -> (Velocity, Velocity)
-adjustSingleCollision collision (hor, ver) = adjust collision
-  where
-    adjust CUp = (hor, 0)
-    adjust CDown = (hor, 0)
-    adjust CLeft = (0, ver)
-    adjust CRight = (0, ver)
-
--- if one of the velocities is 0, set result to 0,
-join :: (Velocity, Velocity) -> (Velocity, Velocity) -> (Velocity, Velocity)
-join (h1, v1) (h2, v2) = (h1 `vAnd` h2, v1 `vAnd` v2)
-  where
-    vAnd 0 _ = 0
-    vAnd _ 0 = 0
-    vAnd a _ = a

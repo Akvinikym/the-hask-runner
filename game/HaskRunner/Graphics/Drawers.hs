@@ -1,6 +1,7 @@
 module HaskRunner.Graphics.Drawers where
 
 import CodeWorld
+import qualified Data.Text as T
 import HaskRunner.Core
 
 -- | All kinds of drawers are located here
@@ -13,8 +14,8 @@ drawLevel level
       <> foldr ((<>) . drawObject (levelPos level)) blank objectsOnScreen
       <> foldr ((<>) . drawObject 0) blank (edges level)
   where
-    objectsOnScreen 
-        = takeWhile (onScreen level) 
+    objectsOnScreen
+        = takeWhile (onScreen level)
           (dropWhile (not . (onScreen level)) (levelMap level))
 
 -- draw player
@@ -56,5 +57,5 @@ drawCircularObject bounds colour
         circ = translated centerX centerY (solidCircle (diameter / 2))
 
 drawGameOverScreen :: Picture
-drawGameOverScreen 
+drawGameOverScreen
   = scaled 2 2 (coloured black (lettering "Game Over!\nPress 'R' to restart"))

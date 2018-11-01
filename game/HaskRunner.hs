@@ -1,4 +1,4 @@
-module HaskRunner where 
+module HaskRunner where
 
 import CodeWorld
 import HaskRunner.Core
@@ -12,24 +12,23 @@ mainLoop :: IO ()
 mainLoop = interactionOf initialWorld timingWorld eventsWorld drawWorld
 
 initialWorld :: Level
-initialWorld 
-    = Level 
-        initialPlayer 
+initialWorld
+    = Level
+        initialPlayer
         (objectGenerator 235432)
-        levelEdges 
+        levelEdges
         100
-        False 
-        True 
+        False
+        True
         0.1
         0
-        0 
         0
   where
     initialPlayer = Player (Bounds
         (Point (-1) 3)
         (Point 1 3)
         (Point 1 (1))
-        (Point (-1) (1))) 0 (-0.5)
+        (Point (-1) (1))) 0 0
 
     exampleInitialObjects = [
         GameObject (Bounds
@@ -76,12 +75,16 @@ initialWorld
 timingWorld :: Double -> Level -> Level
 timingWorld dt level
     | isFinished level = level
-    | otherwise        
-        = playerDeath 
-          . (increaseLevelVelocity dt) 
+    | otherwise
+        = playerDeath
+          . (increaseLevelVelocity dt)
           . movePlayer $ level
 
 eventsWorld :: Event -> Level -> Level
+eventsWorld (KeyPress "F") level
+  = level {gravityIsDown = newDirection}
+  where
+    newDirection = not (gravityIsDown level)
 eventsWorld (KeyPress "R") level
     | isFinished level = initialWorld
     | otherwise        = level

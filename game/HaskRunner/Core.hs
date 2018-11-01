@@ -8,6 +8,10 @@ screenHeight = 12
 screenWidth :: Double
 screenWidth = 20
 
+-- value by which vertical speed is adjusted
+baseGravity :: Double
+baseGravity = (-0.02)
+
 -- how fast the level accelerates
 horizontalAcceleration :: Double
 horizontalAcceleration = 0.05
@@ -21,7 +25,6 @@ data Level = Level
     , isFinished    :: Bool       -- ^ collision with obstacle occured
     , gravityIsDown :: Bool       -- ^ true, if gravity is upside-down
     , horVelocity   :: Velocity   -- ^ world's horizontal velocity
-    , acceleration  :: Double     -- ^ current acceleration caused by the gravity
     , distance      :: Distance   -- ^ distance player travelled so far
     , lilcoins      :: Int        -- ^ number of coins player collected
     } deriving (Show)
@@ -85,7 +88,7 @@ type Velocity = Double
 data GameObject = GameObject
     { bounds       :: Bounds
     , objectType   :: ObjectType
-    }  deriving (Show)  
+    }  deriving (Show)
 
 -- type of what can be generated
 data ObjectType =
@@ -97,13 +100,13 @@ data ObjectType =
 
 -- if collision with object causes death
 deadObject :: GameObject -> Bool
-deadObject (GameObject _ objType) 
+deadObject (GameObject _ objType)
     = objType == Wall || objType == Spikes
 
 -- find out, if the object is on the screen
 onScreen :: Level -> GameObject -> Bool
 onScreen level obj
-    | leftMost < (screenWidth + (levelPos level)) && 
+    | leftMost < (screenWidth + (levelPos level)) &&
       rightMost > (-screenWidth + (levelPos level)) = True
     | otherwise                                     = False
   where
@@ -115,17 +118,17 @@ levelEdges :: Map
 levelEdges = [bottomWall, leftWall, upWall]
   where
     bottomWall = GameObject (Bounds
-        (Point (- screenWidth + 1) (- screenHeight + 3)) 
-        (Point (screenWidth - 1) (- screenHeight + 3)) 
-        (Point (screenWidth - 1) (- screenHeight + 2)) 
+        (Point (- screenWidth + 1) (- screenHeight + 3))
+        (Point (screenWidth - 1) (- screenHeight + 3))
+        (Point (screenWidth - 1) (- screenHeight + 2))
         (Point (- screenWidth + 1) (- screenHeight + 2))) Wall
     leftWall = GameObject (Bounds
-        (Point (- screenWidth + 1) (screenHeight - 3)) 
-        (Point (- screenWidth + 2) (screenHeight - 3)) 
-        (Point (- screenWidth + 2) (- screenHeight + 2)) 
+        (Point (- screenWidth + 1) (screenHeight - 3))
+        (Point (- screenWidth + 2) (screenHeight - 3))
+        (Point (- screenWidth + 2) (- screenHeight + 2))
         (Point (- screenWidth + 1) (- screenHeight + 2))) Wall
     upWall = GameObject (Bounds
-        (Point (- screenWidth + 1) (screenHeight - 2)) 
-        (Point (screenWidth - 1) (screenHeight - 2)) 
-        (Point (screenWidth - 1) (screenHeight - 3)) 
+        (Point (- screenWidth + 1) (screenHeight - 2))
+        (Point (screenWidth - 1) (screenHeight - 2))
+        (Point (screenWidth - 1) (screenHeight - 3))
         (Point (- screenWidth + 1) (screenHeight - 3))) Wall
