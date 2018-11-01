@@ -11,7 +11,7 @@ import HaskRunner.Core
 drawLevel :: Level -> Picture
 drawLevel level
     | isFinished level = drawGameOverScreen
-    | otherwise        = drawScore 0 <> (drawPlayer (player level))
+    | otherwise        = drawScore (gameScore level) <> (drawPlayer (player level))
       <> foldr ((<>) . drawObject (levelPos level)) blank objectsOnScreen
       <> foldr ((<>) . drawObject 0) blank (edges level)
   where

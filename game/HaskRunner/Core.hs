@@ -132,3 +132,6 @@ levelEdges = [bottomWall, leftWall, upWall]
         (Point (screenWidth - 1) (screenHeight - 2))
         (Point (screenWidth - 1) (screenHeight - 3))
         (Point (- screenWidth + 1) (screenHeight - 3))) Wall
+
+gameScore :: Level -> Integer
+gameScore level = floor (levelPos level) - 100
