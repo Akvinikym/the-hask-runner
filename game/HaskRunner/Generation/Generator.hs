@@ -1,15 +1,15 @@
 module HaskRunner.Generation.Generator where
 
 import qualified Data.Graph as G
-import Control.Monad
+import Data.Sort
 import HaskRunner.Core
 import System.Random
 import Data.Maybe
+
 type Seed = Double
 
 -- | TODO: take from Core
 verticalSpeed = 4
--- screenHeight = 12
 initialSpeed = 2
 playerHeight = 2.0
 meanNumberOfWalls = 50
@@ -66,12 +66,11 @@ levelGenerator s = scanl getNextXOrigin (safeZone 0.0) makeObjects
         randomSpikes = map generateRandomSpikes seedRvs
         randomCoins = map generateRandomCoins seedRvs
         mergedObjects = zip3 randomWalls randomSpikes randomCoins
-        makeObjects = map (\ (x1, x2, x3) t-> mergeWhile (x3 t) (mergeWhile (x1 t) (x2 t))) mergedObjects
-        getNextXOrigin prev next =  (safeZone x) ++ next (x + 10.0)
+        makeObjects = map (\ (x1, x2, x3) t-> mergeWhile (sort (x3 t)) (mergeWhile (sort (x1 t)) (sort (x2 t)))) mergedObjects
+        getNextXOrigin prev nxt =  (safeZone x) ++ nxt (x + 10.0)
             where 
                 Point x _ = topRight (bounds (last prev))
 
-platformHeight = 1.0
 
 makeWall :: Double -> Double -> Double -> GameObject
 makeWall x y l = GameObject bounds Platform
@@ -79,8 +78,8 @@ makeWall x y l = GameObject bounds Platform
         bounds = Bounds p1 p2 p3 p4
         p1 = Point x y
         p2 = Point (x + l) y
-        p3 = Point (x + l) (y - platformHeight)
-        p4 = Point x (y - platformHeight)
+        p3 = Point (x + l) (y - 1.0)
+        p4 = Point x (y - 1.0)
 
 -- Comparator returns true if first argument is larger than second
 mergeWhile :: Ord a => [a] -> [a] -> [a]

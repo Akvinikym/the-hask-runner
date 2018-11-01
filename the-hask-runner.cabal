@@ -51,6 +51,7 @@ library
     , random
     , random-fu
     , text
+    , sort
   default-language: Haskell2010
 
 executable the-hask-runner
@@ -70,4 +71,5 @@ executable the-hask-runner
     , random-fu
     , the-hask-runner
     , text
+    , sort
   default-language: Haskell2010

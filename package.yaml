@@ -23,6 +23,7 @@ dependencies:
     - random
     - random-fu
     - algebraic-graphs
+    - sort
 
 default-extensions:
 - DuplicateRecordFields
