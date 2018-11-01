@@ -15,7 +15,7 @@ initialWorld :: Level
 initialWorld
     = Level
         initialPlayer
-        (exampleInitialObjects <> (objectGenerator 235432))
+        (objectGenerator 235432)
         levelEdges
         100
         False
