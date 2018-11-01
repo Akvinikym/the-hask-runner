@@ -68,7 +68,7 @@ levelGenerator s = scanl getNextXOrigin (safeZone 0.0) makeObjects
         mergedObjects = zip randomSpikes randomWalls
         makeObjects = map (\ (x1, x2) t-> mergeWhile (x1 t) (x2 t)) mergedObjects
         -- getNextXOrigin :: [GameObject] -> (Double -> [GameObject]) -> [GameObject]
-        getNextXOrigin prev next =  (safeZone x) ++ next (x + 10.0)
+        getNextXOrigin prev next =  (safeZone x) ++ [makeCoin (x+10.0) 0.0] ++ next (x + 10.0)
             where
                 Point x _ = topRight (bounds (last prev))
 
@@ -139,9 +139,9 @@ generateRandomSpikes s xOrigin = zipWith makeSpike platformXOrigins platformYOri
             yLevels = 6
             uniformRvs = randomRs (0, yLevels - 1) (mkStdGen s)
             numberOfspikes = meanNumberOfSpikes
-            xPositions = map (5*) [0, 1/ (fromIntegral numberOfspikes) .. 1]
+            xPositions = map (6.32 * ) [0, 1/ (fromIntegral numberOfspikes) .. 1]
             platformYOrigins = map (\x -> ((screenHeight*2) / (fromIntegral yLevels)) * (fromIntegral x) - screenHeight + 1.5) (take numberOfspikes uniformRvs)
-            platformXOrigins = scanl (+) xOrigin xPositions
+            platformXOrigins = map (xOrigin +)  xPositions
 
 
 -- TODO insert this into generateRandomWalls
