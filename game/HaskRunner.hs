@@ -81,7 +81,7 @@ timingWorld dt level
           . movePlayer $ level
 
 eventsWorld :: Event -> Level -> Level
-eventsWorld (KeyPress "F") level
+eventsWorld (KeyPress " ") level
   = level {gravityIsDown = newDirection}
   where
     newDirection = not (gravityIsDown level)
