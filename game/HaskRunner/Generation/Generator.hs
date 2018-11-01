@@ -18,6 +18,7 @@ baseOriginOffset = 6.33
 wallBase = 20.0
 meanWallLength = 1.0
 meanNumberOfSpikes = 3
+meanNumberOfCoins = 50
 -- |
 
 -- Helper function for phi_inverse
@@ -63,10 +64,9 @@ levelGenerator s = scanl getNextXOrigin (safeZone 0.0) makeObjects
         seedRvs =  (randoms g :: [Int])
         randomWalls = map generateRandomWalls seedRvs
         randomSpikes = map generateRandomSpikes seedRvs
-        -- [Double -> [GameObject]] [Double -> [GameObject]]
-        mergedObjects = zip randomWalls randomSpikes
-        makeObjects = map (\ (x1, x2) t-> mergeWhile (x1 t) (x2 t)) mergedObjects
-        -- getNextXOrigin :: [GameObject] -> (Double -> [GameObject]) -> [GameObject]
+        randomCoins = map generateRandomCoins seedRvs
+        mergedObjects = zip3 randomWalls randomSpikes randomCoins
+        makeObjects = map (\ (x1, x2, x3) t-> mergeWhile (x3 t) (mergeWhile (x1 t) (x2 t))) mergedObjects
         getNextXOrigin prev next =  (safeZone x) ++ next (x + 10.0)
             where 
                 Point x _ = topRight (bounds (last prev))
@@ -130,6 +130,17 @@ makeCoin x y = GameObject bounds Coin
         p2 = Point (x + 0.25) y
         p3 = Point (x + 0.25) (y - 0.25)
         p4 = Point x (y - 0.25)
+
+generateRandomCoins :: Int -> Double -> [GameObject]
+generateRandomCoins s xOrigin = zipWith makeCoin platformXOrigins platformYOrigins 
+        where
+            yLevels :: Int 
+            yLevels = 6
+            normalRvs = map phi_inverse (randomRs (0.0, 1.0) (mkStdGen s))
+            uniformRvs = randomRs (0, yLevels - 1) (mkStdGen s)
+            numberOfCoins= head (randomRs (0, meanNumberOfCoins) (mkStdGen s))
+            platformYOrigins = map (\x -> ((screenHeight * 2) / (fromIntegral yLevels)) * (fromIntegral x) - screenHeight + 1.5) (take numberOfCoins uniformRvs)
+            platformXOrigins = scanl (+) xOrigin (map (\x -> baseOriginOffset + meanOriginOffset * x) (take numberOfCoins normalRvs))
 
 generateRandomSpikes :: Int -> Double -> [GameObject]
 generateRandomSpikes s xOrigin = zipWith makeSpike platformXOrigins platformYOrigins 
