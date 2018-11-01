@@ -84,6 +84,12 @@ type Velocity = Double
 
 -- | Different generated objects: platforms or obsctacles
 
+instance Eq GameObject where
+    (GameObject (Bounds (Point x _) _ _ _) _) ==  (GameObject (Bounds (Point x' _) _ _ _) _) = x == x'
+
+instance Ord GameObject where
+    (GameObject (Bounds (Point x _) _ _ _) _) `compare` (GameObject (Bounds (Point x' _) _ _ _) _) = x `compare` x'
+
 -- object, representing generated element of the game
 data GameObject = GameObject
     { bounds       :: Bounds
