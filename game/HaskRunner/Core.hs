@@ -81,7 +81,6 @@ type Map = [GameObject]
 type Distance = Double
 type Velocity = Double
 
-
 -- | Different generated objects: platforms or obsctacles
 
 instance Eq GameObject where
