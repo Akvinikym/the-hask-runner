@@ -40,7 +40,10 @@ playerDied level = any deadCollision objectsOnScreen
         = takeWhile (onScreen level)
           (dropWhile (not . (onScreen level)) (levelMap level)) <> edges level
     deadCollision object
-        = collided pBounds (bounds object) && deadObject object
+        = (collided currentAbsPos (bounds object) || collided pBounds (bounds object))
+          && deadObject object
+    playerBounds = pbounds (player level)
+    currentAbsPos = absolutePosition (levelPos level) playerBounds
 
 -- add points if player has picked up any coins and remove these coins from the game
 checkCoins :: Level -> Level
