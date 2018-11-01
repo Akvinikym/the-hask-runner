@@ -47,6 +47,7 @@ collided o1 o2 = collidedX && collidedY
     x (Point c1 _) = c1
     y (Point _ c2) = c2
 
+-- reverse gravity on false
 adjustGravity :: Bool-> Double -> Double
 adjustGravity True base  = base
 adjustGravity False base = -base

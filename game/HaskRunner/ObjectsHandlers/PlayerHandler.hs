@@ -2,6 +2,7 @@ module HaskRunner.ObjectsHandlers.PlayerHandler where
 
 import HaskRunner.Core
 import HaskRunner.Physics
+import Data.List
 
 -- | Player's objects supply functions
 
@@ -39,4 +40,22 @@ playerDied level = any deadCollision objectsOnScreen
         = takeWhile (onScreen level)
           (dropWhile (not . (onScreen level)) (levelMap level)) <> edges level
     deadCollision object
-        = collided pBounds (bounds object) && deadObject object
+        = (collided currentAbsPos (bounds object) || collided pBounds (bounds object))
+          && deadObject object
+    playerBounds = pbounds (player level)
+    currentAbsPos = absolutePosition (levelPos level) playerBounds
+
+-- add points if player has picked up any coins and remove these coins from the game
+checkCoins :: Level -> Level
+checkCoins level = level {lilcoins = coins, levelMap = lmap}
+  where
+    lmap = deleteBy coinCollision undefined (levelMap level)
+    coins = if any (coinCollision undefined) objectsOnScreen then (lilcoins level) + 1 else lilcoins level
+    coinCollision  _ object
+        = collided currentAbsPos (bounds object)
+          && (objectType object) == Coin
+    objectsOnScreen
+        = takeWhile (onScreen level)
+          (dropWhile (not . (onScreen level)) (levelMap level))
+    playerBounds = pbounds (player level)
+    currentAbsPos = absolutePosition (levelPos level) playerBounds
