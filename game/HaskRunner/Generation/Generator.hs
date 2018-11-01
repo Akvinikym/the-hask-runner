@@ -66,7 +66,7 @@ levelGenerator s = scanl getNextXOrigin (safeZone 0.0) makeObjects
         randomSpikes = map generateRandomSpikes seedRvs
         randomCoins = map generateRandomCoins seedRvs
         mergedObjects = zip3 randomWalls randomSpikes randomCoins
-        makeObjects = map (\ (x1, x2, x3) t-> mergeWhile (sort (x3 t)) (mergeWhile (sort (x1 t)) (sort (x2 t)))) mergedObjects
+        makeObjects = map (\ (x1, x2, x3) t-> mergeWhile (x3 t) (mergeWhile (x1 t) (x2 t))) mergedObjects
         getNextXOrigin prev nxt =  (safeZone x) ++ nxt (x + 10.0)
             where 
                 Point x _ = topRight (bounds (last prev))
@@ -135,22 +135,22 @@ generateRandomCoins s xOrigin = zipWith makeCoin platformXOrigins platformYOrigi
         where
             yLevels :: Int 
             yLevels = 6
-            normalRvs = map phi_inverse (randomRs (0.0, 1.0) (mkStdGen s))
+            normalRvs = randomRs (0.0, 1.0) (mkStdGen s)
             uniformRvs = randomRs (0, yLevels - 1) (mkStdGen s)
-            numberOfCoins= head (randomRs (0, meanNumberOfCoins) (mkStdGen s))
+            numberOfCoins = head (randomRs (0, meanNumberOfCoins) (mkStdGen s))
             platformYOrigins = map (\x -> ((screenHeight * 2) / (fromIntegral yLevels)) * (fromIntegral x) - screenHeight + 1.5) (take numberOfCoins uniformRvs)
-            platformXOrigins = scanl (+) xOrigin (map (\x -> baseOriginOffset + meanOriginOffset * x) (take numberOfCoins normalRvs))
+            platformXOrigins = scanl (+) xOrigin (map (\x -> baseOriginOffset * (fromIntegral numberOfCoins) * x) (take numberOfCoins normalRvs))
 
 generateRandomSpikes :: Int -> Double -> [GameObject]
 generateRandomSpikes s xOrigin = zipWith makeSpike platformXOrigins platformYOrigins 
         where
             yLevels :: Int 
             yLevels = 6
-            normalRvs = map phi_inverse (randomRs (0.0, 1.0) (mkStdGen s))
+            normalRvs = randomRs (0.0, 1.0) (mkStdGen s)
             uniformRvs = randomRs (0, yLevels - 1) (mkStdGen s)
-            numberOfspikes = head (randomRs (0, meanNumberOfSpikes) (mkStdGen s))
-            platformYOrigins = map (\x -> ((screenHeight*2) / (fromIntegral yLevels)) * (fromIntegral x) - screenHeight + 1.5) (take numberOfspikes uniformRvs)
-            platformXOrigins = scanl (+) xOrigin (map (\x -> baseOriginOffset + meanOriginOffset * x) (take numberOfspikes normalRvs))
+            numberOfSpikes = head (randomRs (0, meanNumberOfSpikes) (mkStdGen s))
+            platformYOrigins = map (\x -> ((screenHeight*2) / (fromIntegral yLevels)) * (fromIntegral x) - screenHeight + 1.5) (take numberOfSpikes uniformRvs)
+            platformXOrigins = scanl (+) xOrigin (map (\x -> baseOriginOffset * (fromIntegral numberOfSpikes) * x) (take numberOfSpikes normalRvs))
 
 
 -- TODO insert this into generateRandomWalls
