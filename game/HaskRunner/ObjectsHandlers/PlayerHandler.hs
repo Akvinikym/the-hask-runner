@@ -5,6 +5,10 @@ import HaskRunner.Physics
 
 -- | Player's objects supply functions
 
+absolutePosition :: Double -> Bounds -> Bounds
+absolutePosition dist bounds
+  = moveBounds bounds (dist, 0)
+
 -- move the player according to his velocity and gravity
 movePlayer :: Level -> Level
 movePlayer level
@@ -12,6 +16,7 @@ movePlayer level
   where
     newPosition = moveBounds playerBounds (h, v)
     playerBounds = pbounds (player level)
+    currentAbsPos = absolutePosition (levelPos level) playerBounds
     currentGravity = adjustGravity (gravityIsDown level) baseGravity
     levelObjects = map bounds (levelMap level ++ (edges level))
     worldVel = horVelocity level
@@ -21,7 +26,7 @@ movePlayer level
       worldVel
       currentGravity
       (map bounds objectsOnScreen)
-      (pbounds (player level))
+      currentAbsPos
       (hor, vert)
     objectsOnScreen = takeWhile (onScreen level)
       (dropWhile (not . (onScreen level)) (levelMap level)) <> edges level

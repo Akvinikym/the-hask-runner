@@ -50,6 +50,7 @@ library
     , containers
     , random
     , random-fu
+    , text
   default-language: Haskell2010
 
 executable the-hask-runner
@@ -68,4 +69,5 @@ executable the-hask-runner
     , random
     , random-fu
     , the-hask-runner
+    , text
   default-language: Haskell2010
