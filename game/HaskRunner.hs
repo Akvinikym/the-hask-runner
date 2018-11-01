@@ -15,7 +15,7 @@ initialWorld :: Level
 initialWorld
     = Level
         initialPlayer
-        (objectGenerator 235432)
+        (exampleInitialObjects <> (objectGenerator 235432))
         levelEdges
         100
         False
@@ -32,10 +32,10 @@ initialWorld
 
     exampleInitialObjects = [
         GameObject (Bounds
-            (Point (105) (4))
-            (Point 109 (4))
-            (Point 109 (0))
-            (Point 105 (0))) Coin]
+            (Point (105) (2))
+            (Point 107 (2))
+            (Point 107 (0))
+            (Point 107 (0))) Coin]
         -- GameObject (Bounds
         --     (Point 3 4)
         --     (Point 13 4)

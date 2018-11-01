@@ -40,10 +40,11 @@ playerDied level = any deadCollision objectsOnScreen
         = takeWhile (onScreen level)
           (dropWhile (not . (onScreen level)) (levelMap level)) <> edges level
     deadCollision object
-        = (collided currentAbsPos (bounds object) || collided pBounds (bounds object))
+        = (collided absPos (bounds object) || collided pBounds (bounds object))
           && deadObject object
     playerBounds = pbounds (player level)
     currentAbsPos = absolutePosition (levelPos level) playerBounds
+    absPos = moveBounds currentAbsPos (horizontalAcceleration, pVertVelocity (player level))
 
 -- add points if player has picked up any coins and remove these coins from the game
 checkCoins :: Level -> Level
@@ -52,10 +53,11 @@ checkCoins level = level {lilcoins = coins, levelMap = lmap}
     lmap = deleteBy coinCollision undefined (levelMap level)
     coins = if any (coinCollision undefined) objectsOnScreen then (lilcoins level) + 1 else lilcoins level
     coinCollision  _ object
-        = collided currentAbsPos (bounds object)
+        = collided absPos (bounds object)
           && (objectType object) == Coin
     objectsOnScreen
         = takeWhile (onScreen level)
           (dropWhile (not . (onScreen level)) (levelMap level))
     playerBounds = pbounds (player level)
     currentAbsPos = absolutePosition (levelPos level) playerBounds
+    absPos = moveBounds currentAbsPos (horizontalAcceleration, pVertVelocity (player level))
