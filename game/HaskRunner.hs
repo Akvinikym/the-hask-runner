@@ -32,35 +32,35 @@ initialWorld
 
     exampleInitialObjects = [
         GameObject (Bounds
-            (Point (-5) (-4))
-            (Point 5 (-4))
-            (Point 5 (-6))
-            (Point (-5) (-6))) Platform,
-        GameObject (Bounds
-            (Point 3 4)
-            (Point 13 4)
-            (Point 13 2)
-            (Point 3 2)) Platform,
-        GameObject (Bounds
-            (Point 11 (-4))
-            (Point 21 (-4))
-            (Point 21 (-6))
-            (Point 11 (-6))) Platform,
-        GameObject (Bounds
-            (Point 19 4)
-            (Point 29 4)
-            (Point 29 2)
-            (Point 19 2)) Platform,
-        GameObject (Bounds
-            (Point 27 (-4))
-            (Point 37 (-4))
-            (Point 37 (-6))
-            (Point 27 (-6))) Platform,
-        GameObject (Bounds
-            (Point 35 4)
-            (Point 45 4)
-            (Point 45 2)
-            (Point 35 2)) Platform]
+            (Point (105) (4))
+            (Point 109 (4))
+            (Point 109 (0))
+            (Point 105 (0))) Coin]
+        -- GameObject (Bounds
+        --     (Point 3 4)
+        --     (Point 13 4)
+        --     (Point 13 2)
+        --     (Point 3 2)) Platform,
+        -- GameObject (Bounds
+        --     (Point 11 (-4))
+        --     (Point 21 (-4))
+        --     (Point 21 (-6))
+        --     (Point 11 (-6))) Platform,
+        -- GameObject (Bounds
+        --     (Point 19 4)
+        --     (Point 29 4)
+        --     (Point 29 2)
+        --     (Point 19 2)) Platform,
+        -- GameObject (Bounds
+        --     (Point 27 (-4))
+        --     (Point 37 (-4))
+        --     (Point 37 (-6))
+        --     (Point 27 (-6))) Platform,
+        -- GameObject (Bounds
+        --     (Point 35 4)
+        --     (Point 45 4)
+        --     (Point 45 2)
+        --     (Point 35 2)) Platform]
         -- GameObject (Bounds
         --     (Point 15 (0))
         --     (Point 17 (0))
@@ -76,12 +76,12 @@ timingWorld :: Double -> Level -> Level
 timingWorld dt level
     | isFinished level = level
     | otherwise
-        = playerDeath
+        = playerDeath . checkCoins
           . (increaseLevelVelocity dt)
           . movePlayer $ level
 
 eventsWorld :: Event -> Level -> Level
-eventsWorld (KeyPress "F") level
+eventsWorld (KeyPress " ") level
   = level {gravityIsDown = newDirection}
   where
     newDirection = not (gravityIsDown level)

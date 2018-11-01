@@ -132,3 +132,7 @@ levelEdges = [bottomWall, leftWall, upWall]
         (Point (screenWidth - 1) (screenHeight - 2))
         (Point (screenWidth - 1) (screenHeight - 3))
         (Point (- screenWidth + 1) (screenHeight - 3))) Wall
+
+-- calculate total score of the player
+gameScore :: Level -> Integer
+gameScore level = toInteger ((floor (levelPos level)) - 100 + (100 * (lilcoins level)))
