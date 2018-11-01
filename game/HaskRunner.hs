@@ -1,6 +1,7 @@
 module HaskRunner where
 
 import CodeWorld
+import System.Random
 import HaskRunner.Core
 import HaskRunner.Graphics.Drawers
 import HaskRunner.Generation.Generator
@@ -9,13 +10,16 @@ import HaskRunner.ObjectsHandlers.PlayerHandler
 import HaskRunner.ObjectsHandlers.GameObjectsHandler
 
 mainLoop :: IO ()
-mainLoop = interactionOf initialWorld timingWorld eventsWorld drawWorld
+mainLoop =
+  do
+    seed <- randomRIO (1, 10000000)
+    interactionOf (initialWorld seed) timingWorld eventsWorld drawWorld
 
-initialWorld :: Level
-initialWorld
+initialWorld :: Int -> Level
+initialWorld seed
     = Level
         initialPlayer
-        (objectGenerator 235432)
+        (objectGenerator seed)
         levelEdges
         100
         False
@@ -86,7 +90,7 @@ eventsWorld (KeyPress " ") level
   where
     newDirection = not (gravityIsDown level)
 eventsWorld (KeyPress "R") level
-    | isFinished level = initialWorld
+    | isFinished level = initialWorld 1337
     | otherwise        = level
 eventsWorld _ level = level
 
