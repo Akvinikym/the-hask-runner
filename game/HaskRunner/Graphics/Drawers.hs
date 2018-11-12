@@ -9,15 +9,35 @@ import HaskRunner.Core
 
 -- draw player and all objects currently on the screen
 drawLevel :: Level -> Picture
-drawLevel level
-    | isFinished level = drawGameOverScreen level
-    | otherwise        = drawScore (gameScore level) <> (drawPlayer (player level))
-      <> foldr ((<>) . drawObject (levelPos level)) blank objectsOnScreen
-      <> foldr ((<>) . drawObject 0) blank (edges level)
+drawLevel level = case (state level) of
+    Playing  -> drawFullLevel level
+    Dead     -> drawGameOverScreen level
+    MainMenu -> drawMainMenu level
+
+
+drawFullLevel :: Level -> Picture
+drawFullLevel level 
+    = drawScore (gameScore level) <> (drawPlayer (player level))
+        <> foldr ((<>) . drawObject (levelPos level)) blank objectsOnScreen
+        <> foldr ((<>) . drawObject 0) blank (edges level)
+    where
+        objectsOnScreen
+            = takeWhile (onScreen level)
+                (dropWhile (not . (onScreen level)) (levelMap level))
+
+drawGameOverScreen :: Level -> Picture
+drawGameOverScreen level
+  = scaled 2 2 ((coloured black finalMessage)
+  <> (translated 0 (-2) (lettering finalScore)))
   where
-    objectsOnScreen
-        = takeWhile (onScreen level)
-          (dropWhile (not . (onScreen level)) (levelMap level))
+    finalMessage = lettering "Game Over!\nPress 'R' to restart\n"
+    finalScore = T.pack ("Final score: " ++  show (gameScore level))
+
+drawMainMenu :: Level -> Picture
+drawMainMenu _ = scaled 2 2 ((coloured black entryMessage))
+  where
+    entryMessage = lettering "Welcome!\nPress 'S' to start the game!"
+
 
 drawScore :: Integer -> Picture
 drawScore score = translated scoreX scoreY scorePic
@@ -63,11 +83,3 @@ drawCircularObject bounds colour
         (diameter, _) = boundsWidthHeight bounds
         (Point centerX centerY) = boundsCenter bounds
         circ = translated centerX centerY (solidCircle (diameter / 2))
-
-drawGameOverScreen :: Level -> Picture
-drawGameOverScreen level
-  = scaled 2 2 ((coloured black finalMessage)
-  <> (translated 0 (-2) (lettering finalScore)))
-  where
-    finalMessage = lettering "Game Over!\nPress 'R' to restart\n"
-    finalScore = T.pack ("Final score: " ++  show (gameScore level))

@@ -18,7 +18,7 @@ initialWorld
         (objectGenerator 235432)
         levelEdges
         100
-        False
+        Playing
         True
         0.1
         0
@@ -73,21 +73,25 @@ initialWorld
         --     (Point (-1) (-1))) Coin]
 
 timingWorld :: Double -> Level -> Level
-timingWorld dt level
-    | isFinished level = level
-    | otherwise
-        = playerDeath . checkCoins
-          . (increaseLevelVelocity dt)
-          . movePlayer $ level
+timingWorld dt level = case (state level) of
+    Playing -> playerDeath 
+                . checkCoins
+                . (increaseLevelVelocity dt)
+                . movePlayer $ level
+    _       -> level
 
 eventsWorld :: Event -> Level -> Level
 eventsWorld (KeyPress " ") level
-  = level {gravityIsDown = newDirection}
+    | (state level) == Playing = level {gravityIsDown = newDirection}
+    | otherwise                = level
   where
     newDirection = not (gravityIsDown level)
 eventsWorld (KeyPress "R") level
-    | isFinished level = initialWorld
-    | otherwise        = level
+    | (state level) == Dead = initialWorld
+    | otherwise             = level
+eventsWorld (KeyPress "S") level
+    | (state level) == MainMenu = initialWorld
+    | otherwise                 = level
 eventsWorld _ level = level
 
 drawWorld :: Level -> Picture

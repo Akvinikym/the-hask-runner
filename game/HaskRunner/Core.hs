@@ -22,13 +22,18 @@ data Level = Level
     , levelMap      :: Map        -- ^ collection of current game objects
     , edges         :: Map        -- ^ collection of game borders
     , levelPos      :: Double     -- ^ position of the level screen
-    , isFinished    :: Bool       -- ^ collision with obstacle occured
+    , state         :: GameState  -- ^ current state of the game
     , gravityIsDown :: Bool       -- ^ true, if gravity is upside-down
     , horVelocity   :: Velocity   -- ^ world's horizontal velocity
     , distance      :: Distance   -- ^ distance player travelled so far
     , lilcoins      :: Int        -- ^ number of coins player collected
     } deriving (Show)
 
+data GameState = 
+    MainMenu 
+    | Playing 
+    | Dead 
+    deriving (Show, Eq)
 
 -- player of the game
 data Player = Player

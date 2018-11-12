@@ -17,5 +17,5 @@ increaseLevelVelocity dt level = level {
 -- check, if player died; if so, update the level accordingly
 playerDeath :: Level -> Level
 playerDeath level
-    | playerDied level = level { isFinished = True }
+    | playerDied level = level { state = Dead }
     | otherwise        = level

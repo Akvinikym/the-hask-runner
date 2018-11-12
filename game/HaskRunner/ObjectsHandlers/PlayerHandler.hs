@@ -6,6 +6,14 @@ import Data.List
 
 -- | Player's objects supply functions
 
+-- player's initial state and position
+initialPlayer :: Player
+initialPlayer = Player (Bounds
+    (Point (-1) 3)
+    (Point 1 3)
+    (Point 1 (1))
+    (Point (-1) (1))) 0 0
+
 absolutePosition :: Double -> Bounds -> Bounds
 absolutePosition dist bounds
   = moveBounds bounds (dist, 0)
