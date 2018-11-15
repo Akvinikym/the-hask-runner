@@ -9,7 +9,11 @@ import HaskRunner.ObjectsHandlers.PlayerHandler
 import HaskRunner.ObjectsHandlers.GameObjectsHandler
 
 mainLoop :: IO ()
-mainLoop = interactionOf initialWorld timingWorld eventsWorld drawWorld
+mainLoop = interactionOf 
+  (initialWorld {state = MainMenu}) 
+  timingWorld 
+  eventsWorld 
+  drawWorld
 
 initialWorld :: Level
 initialWorld
