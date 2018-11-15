@@ -2,7 +2,6 @@ module HaskRunner.Graphics.Drawers where
 
 import CodeWorld
 import qualified Data.Text as T
-import Data.Text.Read
 import HaskRunner.Core
 
 -- | All kinds of drawers are located here
@@ -17,7 +16,9 @@ drawLevel level = case (state level) of
 
 drawFullLevel :: Level -> Picture
 drawFullLevel level 
-    = drawScore (gameScore level) <> (drawPlayer (player level))
+    = drawScore level
+        <> (drawPlayer (player1 level))
+        <> (drawPlayer (player2 level))
         <> foldr ((<>) . drawObject (levelPos level)) blank objectsOnScreen
         <> foldr ((<>) . drawObject 0) blank (edges level)
     where
@@ -28,10 +29,14 @@ drawFullLevel level
 drawGameOverScreen :: Level -> Picture
 drawGameOverScreen level
   = scaled 2 2 ((coloured black finalMessage)
-  <> (translated 0 (-2) (lettering finalScore)))
+    <> (translated 0 (-2) (lettering finalScore1))
+    <> (translated 0 (-4) (lettering finalScore2)))
   where
-    finalMessage = lettering "Game Over!\nPress 'R' to restart\n"
-    finalScore = T.pack ("Final score: " ++  show (gameScore level))
+    score1 = gameScore level (player1 level)
+    score2 = gameScore level (player2 level)
+    finalMessage = lettering "Game Over! Press 'R' to restart"
+    finalScore1 = T.pack("Final score of player 1: " ++  show score1)
+    finalScore2 = T.pack("Final score of player 2: " ++  show score2)
 
 drawMainMenu :: Level -> Picture
 drawMainMenu _ = scaled 2 2 ((coloured black entryMessage))
@@ -39,12 +44,21 @@ drawMainMenu _ = scaled 2 2 ((coloured black entryMessage))
     entryMessage = lettering "Welcome!\nPress 'S' to start the game!"
 
 
-drawScore :: Integer -> Picture
-drawScore score = translated scoreX scoreY scorePic
+drawScore :: Level -> Picture
+drawScore level = (translated score1X score1Y score1Pic)
+    <> (translated score2X score2Y score2Pic)
   where
-    scorePic = colored white (lettering (T.pack ("score: " ++ show score)))
-    scoreX = (-(screenWidth / 2 + 4))
-    scoreY = (screenHeight / 2 + 3.5)
+    score1 = gameScore level (player1 level)
+    score1Pic 
+        = colored white (lettering (T.pack ("player 1 score: " ++ show score1)))
+    score1X = (-(screenWidth / 2 + 4))
+    score1Y = (screenHeight / 2 + 3.5)
+
+    score2 = gameScore level (player2 level)
+    score2Pic 
+        = colored white (lettering (T.pack ("player 2 score: " ++ show score2)))
+    score2X = (screenWidth / 2 + 4)
+    score2Y = (screenHeight / 2 + 3.5)
 
 -- draw player
 drawPlayer :: Player -> Picture

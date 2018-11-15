@@ -18,21 +18,25 @@ mainLoop = interactionOf
 initialWorld :: Level
 initialWorld
     = Level
-        initialPlayer
+        initialPlayer1
+        initialPlayer2
         (objectGenerator 235432)
         levelEdges
         100
         Playing
-        True
         0.1
-        0
-        0
   where
-    initialPlayer = Player (Bounds
+    initialPlayer1 = Player (Bounds
         (Point (-1) 3)
         (Point 1 3)
         (Point 1 (1))
-        (Point (-1) (1))) 0 0
+        (Point (-1) (1))) 0 0 True 0
+
+    initialPlayer2 = Player (Bounds
+        (Point (-1) (-1))
+        (Point 1 (-1))
+        (Point 1 (-3))
+        (Point (-1) (-3))) 0 0 True 0
 
     exampleInitialObjects = [
         GameObject (Bounds
@@ -78,18 +82,34 @@ initialWorld
 
 timingWorld :: Double -> Level -> Level
 timingWorld dt level = case (state level) of
-    Playing -> playerDeath 
-                . checkCoins
-                . (increaseLevelVelocity dt)
-                . movePlayer $ level
+    Playing ->  (increaseLevelVelocity dt)
+                . playerDeath __player1
+                . playerDeath __player2
+                . checkCoins __player1
+                . checkCoins __player2
+                . movePlayer __player1
+                . movePlayer __player2
+                $ level
     _       -> level
+  where
+    __player1 = player1 level
+    __player2 = player2 level
 
 eventsWorld :: Event -> Level -> Level
 eventsWorld (KeyPress " ") level
-    | (state level) == Playing = level {gravityIsDown = newDirection}
+    | (state level) == Playing = newLevel
     | otherwise                = level
   where
-    newDirection = not (gravityIsDown level)
+    __player1 = player1 level
+    newLevel = level { 
+        player1 = __player1 {gravityIsDown = not (gravityIsDown __player1)} }
+eventsWorld (KeyPress ".") level
+    | (state level) == Playing = newLevel
+    | otherwise                = level
+  where
+    __player2 = player2 level
+    newLevel = level { 
+        player2 = __player2 {gravityIsDown = not (gravityIsDown __player2)} }
 eventsWorld (KeyPress "R") level
     | (state level) == Dead = initialWorld
     | otherwise             = level

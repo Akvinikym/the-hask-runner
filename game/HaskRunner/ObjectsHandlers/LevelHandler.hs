@@ -15,7 +15,7 @@ increaseLevelVelocity dt level = level {
     newVelocity = (horVelocity level) + dt * horizontalAcceleration
 
 -- check, if player died; if so, update the level accordingly
-playerDeath :: Level -> Level
-playerDeath level
-    | playerDied level = level { state = Dead }
+playerDeath :: Player -> Level -> Level
+playerDeath player level
+    | playerDied level player = level { state = Dead }
     | otherwise        = level

@@ -6,30 +6,25 @@ import Data.List
 
 -- | Player's objects supply functions
 
--- player's initial state and position
-initialPlayer :: Player
-initialPlayer = Player (Bounds
-    (Point (-1) 3)
-    (Point 1 3)
-    (Point 1 (1))
-    (Point (-1) (1))) 0 0
-
 absolutePosition :: Double -> Bounds -> Bounds
 absolutePosition dist bounds
   = moveBounds bounds (dist, 0)
 
--- move the player according to his velocity and gravity
-movePlayer :: Level -> Level
-movePlayer level
-  = level { player = (Player newPosition h v)}
+-- move the players according to his velocity and gravity
+movePlayer :: Player -> Level -> Level
+movePlayer player level 
+    | player == (player1 level) = level {player1 = newPlayer}
+    | otherwise                 = level {player2 = newPlayer}
   where
+    newPlayer = Player newPosition h v (gravityIsDown player) (lilcoins player)
+
     newPosition = moveBounds playerBounds (h, v)
-    playerBounds = pbounds (player level)
+    playerBounds = pbounds player
     currentAbsPos = absolutePosition (levelPos level) playerBounds
-    currentGravity = adjustGravity (gravityIsDown level) baseGravity
+    currentGravity = adjustGravity (gravityIsDown player) baseGravity
     worldVel = horVelocity level
-    hor = pHorVelocity (player level)
-    vert = pVertVelocity (player level)
+    hor = pHorVelocity player
+    vert = pVertVelocity player
     (h, v) = adjustVelocity
       worldVel
       currentGravity
@@ -40,32 +35,39 @@ movePlayer level
       (dropWhile (not . (onScreen level)) (levelMap level)) <> edges level
 
 -- find out, if the player dies, collided with some obstacle
-playerDied :: Level -> Bool
-playerDied level = any deadCollision objectsOnScreen
+playerDied :: Level -> Player -> Bool
+playerDied level player = any deadCollision objectsOnScreen
   where
-    (Level (Player pBounds _ _) objects _ _ _ _ _ _ _) = level
+    (Level _ _ objects _ _ _ _) = level
     objectsOnScreen
         = takeWhile (onScreen level)
           (dropWhile (not . (onScreen level)) (levelMap level)) <> edges level
     deadCollision object
-        = (collided absPos (bounds object) || collided pBounds (bounds object))
+        = (collided absPos (bounds object) || collided playerBounds (bounds object))
           && deadObject object
-    playerBounds = pbounds (player level)
+    playerBounds = pbounds player
     currentAbsPos = absolutePosition (levelPos level) playerBounds
-    absPos = moveBounds currentAbsPos (horizontalAcceleration, pVertVelocity (player level))
+    absPos = moveBounds currentAbsPos (horizontalAcceleration, pVertVelocity player)
 
 -- add points if player has picked up any coins and remove these coins from the game
-checkCoins :: Level -> Level
-checkCoins level = level {lilcoins = coins, levelMap = lmap}
+checkCoins :: Player -> Level -> Level
+checkCoins player level
+    | player == player1 level 
+        = level { player1 = __player1 {lilcoins = coins}, levelMap = lmap}
+    | otherwise
+        = level { player2 = __player2 {lilcoins = coins}, levelMap = lmap}
   where
+    __player1 = player1 level
+    __player2 = player2 level
+
     lmap = deleteBy coinCollision undefined (levelMap level)
-    coins = if any (coinCollision undefined) objectsOnScreen then (lilcoins level) + 1 else lilcoins level
+    coins = if any (coinCollision undefined) objectsOnScreen then (lilcoins player) + 1 else lilcoins player
     coinCollision  _ object
         = collided absPos (bounds object)
           && (objectType object) == Coin
     objectsOnScreen
         = takeWhile (onScreen level)
           (dropWhile (not . (onScreen level)) (levelMap level))
-    playerBounds = pbounds (player level)
+    playerBounds = pbounds player
     currentAbsPos = absolutePosition (levelPos level) playerBounds
-    absPos = moveBounds currentAbsPos (horizontalAcceleration, pVertVelocity (player level))
+    absPos = moveBounds currentAbsPos (horizontalAcceleration, pVertVelocity player)

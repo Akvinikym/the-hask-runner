@@ -18,15 +18,13 @@ horizontalAcceleration = 0.05
 
 -- current level state; main state of the world as well
 data Level = Level
-    { player        :: Player     -- ^ player of the game
+    { player1       :: Player     -- ^ first player
+    , player2       :: Player     -- ^ second player
     , levelMap      :: Map        -- ^ collection of current game objects
     , edges         :: Map        -- ^ collection of game borders
     , levelPos      :: Double     -- ^ position of the level screen
     , state         :: GameState  -- ^ current state of the game
-    , gravityIsDown :: Bool       -- ^ true, if gravity is upside-down
     , horVelocity   :: Velocity   -- ^ world's horizontal velocity
-    , distance      :: Distance   -- ^ distance player travelled so far
-    , lilcoins      :: Int        -- ^ number of coins player collected
     } deriving (Show)
 
 data GameState = 
@@ -37,10 +35,12 @@ data GameState =
 
 -- player of the game
 data Player = Player
-  {  pbounds :: Bounds         -- ^ players position
-  ,  pHorVelocity :: Velocity  -- ^ player's horizontal velocity
-  ,  pVertVelocity :: Velocity -- ^ player's vertical velocity
-  } deriving (Show)
+  {  pbounds       :: Bounds    -- ^ players position
+  ,  pHorVelocity  :: Velocity  -- ^ player's horizontal velocity
+  ,  pVertVelocity :: Velocity  -- ^ player's vertical velocity
+  ,  gravityIsDown :: Bool      -- ^ true, if gravity is upside-down
+  ,  lilcoins      :: Int       -- ^ number of coins player collected
+  } deriving (Show, Eq)
 
 
 -- rectangular bounds of the object
@@ -49,7 +49,7 @@ data Bounds = Bounds
     , topRight    :: Point
     , bottomRight :: Point
     , bottomLeft  :: Point
-    } deriving (Show)
+    } deriving (Show, Eq)
 
 -- move the bounds to some direction: for example,
 -- (-1, -1) will move the bounds left-bottom to 1 point
@@ -80,10 +80,9 @@ boundsLeftRightCoords bounds = (leftMost, rightMost)
 
 
 data Point = Point Double Double
-    deriving (Show)
+    deriving (Show, Eq)
 
 type Map = [GameObject]
-type Distance = Double
 type Velocity = Double
 
 -- | Different generated objects: platforms or obsctacles
@@ -144,5 +143,6 @@ levelEdges = [bottomWall, leftWall, upWall]
         (Point (- screenWidth + 1) (screenHeight - 3))) Wall
 
 -- calculate total score of the player
-gameScore :: Level -> Integer
-gameScore level = toInteger ((floor (levelPos level)) - 100 + (100 * (lilcoins level)))
+gameScore :: Level -> Player -> Integer
+gameScore level player 
+    = toInteger ((floor (levelPos level)) - 100 + (100 * (lilcoins player)))
