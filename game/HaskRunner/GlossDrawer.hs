@@ -6,7 +6,7 @@ import HaskRunner.Core
 
 -- How much to scale the picture
 scaleFactor :: Float
-scaleFactor = 35
+scaleFactor = 41
 
 drawLevel :: Level -> Picture
 drawLevel level = case (state level) of
@@ -72,7 +72,8 @@ drawRectangularObject bounds c
       where
         (width, height) = boundsWidthHeight bounds
         (Point centerX centerY) = boundsCenter bounds
-        rect = translate (double2Float centerX) (double2Float centerY) (rectangleSolid (double2Float width) (double2Float height))
+       -- rect = translate (double2Float centerX) (double2Float centerY) (rectangleSolid (double2Float centerX) (double2Float centerY))
+        rect = translate (double2Float centerX) (double2Float centerY) (polygon (rectanglePath (double2Float width) (double2Float height)))
 
 drawObject :: Double -> GameObject -> Picture
 drawObject offset (GameObject bounds Platform)

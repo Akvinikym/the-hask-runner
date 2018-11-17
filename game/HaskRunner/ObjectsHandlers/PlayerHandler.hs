@@ -29,20 +29,15 @@ movePlayer dt player level
       worldVel
       dt
       currentGravity
-      (map bounds objectsOnScreen)
+      (map bounds (objectsOnScreen level <> edges level))
       currentAbsPos
       (hor, vert)
-    objectsOnScreen = takeWhile (onScreen level)
-      (dropWhile (not . (onScreen level)) (levelMap level)) <> edges level
 
 -- find out, if the player dies, collided with some obstacle
 playerDied :: Level -> Player -> Bool
-playerDied level player = any deadCollision objectsOnScreen
+playerDied level player = any deadCollision (objectsOnScreen level <> edges level)
   where
     (Level _ _ objects _ _ _ _) = level
-    objectsOnScreen
-        = takeWhile (onScreen level)
-          (dropWhile (not . (onScreen level)) (levelMap level)) <> edges level
     deadCollision object
         = (collided absPos (bounds object) || collided playerBounds (bounds object))
           && deadObject object

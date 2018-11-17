@@ -69,7 +69,7 @@ boundsCenter (Bounds (Point x1 y1) _ (Point x2 y2) _)
 -- find width and height of the bounds rectangle
 boundsWidthHeight :: Bounds -> (Double, Double)
 boundsWidthHeight (Bounds (Point x1 y1) _ (Point x2 y2) _)
-    = (x2 - x1, y2 - y1)
+    = (x2 - x1, y1 - y2)
 
 -- find right-most and left-most X coordinates of the bounds
 boundsLeftRightCoords :: Bounds -> (Double, Double)
