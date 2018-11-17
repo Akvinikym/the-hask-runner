@@ -9,10 +9,10 @@ import HaskRunner.ObjectsHandlers.PlayerHandler
 import HaskRunner.ObjectsHandlers.GameObjectsHandler
 
 mainLoop :: IO ()
-mainLoop = interactionOf 
-  (initialWorld {state = MainMenu}) 
-  timingWorld 
-  eventsWorld 
+mainLoop = interactionOf
+  (initialWorld {state = MainMenu})
+  timingWorld
+  eventsWorld
   drawWorld
 
 initialWorld :: Level
@@ -87,8 +87,8 @@ timingWorld dt level = case (state level) of
                 . playerDeath __player2
                 . checkCoins __player1
                 . checkCoins __player2
-                . movePlayer __player1
-                . movePlayer __player2
+                . movePlayer dt __player1
+                . movePlayer dt __player2
                 $ level
     _       -> level
   where
@@ -101,14 +101,14 @@ eventsWorld (KeyPress " ") level
     | otherwise                = level
   where
     __player1 = player1 level
-    newLevel = level { 
+    newLevel = level {
         player1 = __player1 {gravityIsDown = not (gravityIsDown __player1)} }
 eventsWorld (KeyPress ".") level
     | (state level) == Playing = newLevel
     | otherwise                = level
   where
     __player2 = player2 level
-    newLevel = level { 
+    newLevel = level {
         player2 = __player2 {gravityIsDown = not (gravityIsDown __player2)} }
 eventsWorld (KeyPress "R") level
     | (state level) == Dead = initialWorld

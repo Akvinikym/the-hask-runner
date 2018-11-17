@@ -7,14 +7,15 @@ import HaskRunner.Core
 -- then sees if it is possible to move in that position
 adjustVelocity :: Double
                -> Double
+               -> Double
                -> [Bounds]
                -> Bounds
                -> (Velocity, Velocity)
                -> (Velocity, Velocity)
-adjustVelocity worldVel gravity objects player (hor, ver) = (adjustHor hCollisions, adjustVert vCollisions)
+adjustVelocity worldVel dt gravity objects player (hor, ver) = (adjustHor hCollisions, adjustVert vCollisions)
   where
     newHor = if hor == 0 then 0 + horizontalAcceleration else 0
-    newVert = ver + gravity
+    newVert = ver + gravity * dt
     hCollisions = hcollisions player objects newHor
     vCollisions = vcollisions player objects newVert
     adjustVert True = if hCollisions then newVert else 0

@@ -70,8 +70,8 @@ timingWorld dt level = case (state level) of
                 -- . playerDeath __player2
                 . checkCoins __player1
                 . checkCoins __player2
-                . movePlayer __player1
-                . movePlayer __player2
+                . movePlayer (float2Double dt) __player1
+                . movePlayer (float2Double dt) __player2
                 $ level
     _       -> level
   where

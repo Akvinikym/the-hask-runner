@@ -10,11 +10,11 @@ screenWidth = 20
 
 -- value by which vertical speed is adjusted
 baseGravity :: Double
-baseGravity = (-0.00)
+baseGravity = (-0.3)
 
 -- how fast the level accelerates
 horizontalAcceleration :: Double
-horizontalAcceleration = 0.00
+horizontalAcceleration = 0.02
 
 -- current level state; main state of the world as well
 data Level = Level
