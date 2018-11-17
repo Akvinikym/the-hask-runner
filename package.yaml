@@ -23,6 +23,9 @@ dependencies:
     - random
     - random-fu
     - algebraic-graphs
+    - gloss-rendering
+    - gloss
+    - text
 
 default-extensions:
 - DuplicateRecordFields

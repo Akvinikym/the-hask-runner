@@ -38,7 +38,7 @@ phi_inverse p | p < 0.5 = - rational_approx( sqrt (-2.0*log(p)))
 --     drawGame = drawObjects . objectGenerator
 -- -}
 objectGenerator :: Int -> [GameObject]
-objectGenerator s = foldr (++) [] (levelGenerator s)
+objectGenerator s = concat (levelGenerator s)
 
 
 -- -- Objects at the start of the level

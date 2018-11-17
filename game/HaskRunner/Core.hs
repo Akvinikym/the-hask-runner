@@ -10,11 +10,11 @@ screenWidth = 20
 
 -- value by which vertical speed is adjusted
 baseGravity :: Double
-baseGravity = (-0.02)
+baseGravity = (-0.00)
 
 -- how fast the level accelerates
 horizontalAcceleration :: Double
-horizontalAcceleration = 0.05
+horizontalAcceleration = 0.00
 
 -- current level state; main state of the world as well
 data Level = Level
@@ -27,10 +27,10 @@ data Level = Level
     , horVelocity   :: Velocity   -- ^ world's horizontal velocity
     } deriving (Show)
 
-data GameState = 
-    MainMenu 
-    | Playing 
-    | Dead 
+data GameState =
+    MainMenu
+    | Playing
+    | Dead
     deriving (Show, Eq)
 
 -- player of the game
@@ -144,5 +144,10 @@ levelEdges = [bottomWall, leftWall, upWall]
 
 -- calculate total score of the player
 gameScore :: Level -> Player -> Integer
-gameScore level player 
+gameScore level player
     = toInteger ((floor (levelPos level)) - 100 + (100 * (lilcoins player)))
+
+objectsOnScreen :: Level -> [GameObject]
+objectsOnScreen level
+  = take 50
+    (dropWhile (not . (onScreen level)) (levelMap level))
