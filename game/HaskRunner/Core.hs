@@ -40,6 +40,7 @@ data Player = Player
   ,  pVertVelocity :: Velocity  -- ^ player's vertical velocity
   ,  gravityIsDown :: Bool      -- ^ true, if gravity is upside-down
   ,  lilcoins      :: Int       -- ^ number of coins player collected
+  ,  isDead        :: Bool      -- ^ is the player dead?
   } deriving (Show, Eq)
 
 

@@ -31,13 +31,13 @@ initialWorld
         (Point (-1) 3)
         (Point 1 3)
         (Point 1 (1))
-        (Point (-1) (1))) 0 0 True 0
+        (Point (-1) (1))) 0 0 True 0 False
 
     initialPlayer2 = Player (Bounds
         (Point (-1) (-1))
         (Point 1 (-1))
         (Point 1 (-3))
-        (Point (-1) (-3))) 0 0 True 0
+        (Point (-1) (-3))) 0 0 True 0 False
 
 eventsWorld :: Event -> Level -> Level
 -- eventsWorld _ =
@@ -66,8 +66,7 @@ eventsWorld _ level = level
 timingWorld :: Float -> Level -> Level
 timingWorld dt level = case (state level) of
     Playing ->  (increaseLevelVelocity (float2Double dt))
-                . playerDeath __player1
-                -- . playerDeath __player2
+                . playersDeaths
                 . checkCoins __player1
                 . checkCoins __player2
                 . movePlayer (float2Double dt) __player1

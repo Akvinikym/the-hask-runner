@@ -16,7 +16,13 @@ movePlayer dt player level
     | player == (player1 level) = level {player1 = newPlayer}
     | otherwise                 = level {player2 = newPlayer}
   where
-    newPlayer = Player newPosition h v (gravityIsDown player) (lilcoins player)
+    newPlayer = Player 
+        newPosition 
+        h 
+        v 
+        (gravityIsDown player) 
+        (lilcoins player) 
+        (isDead player)
 
     newPosition = moveBounds playerBounds (h, v)
     playerBounds = pbounds player
@@ -67,3 +73,7 @@ checkCoins player level
     playerBounds = pbounds player
     currentAbsPos = absolutePosition (levelPos level) playerBounds
     absPos = moveBounds currentAbsPos (horizontalAcceleration, pVertVelocity player)
+
+-- kill the player
+killPlayer :: Player -> Player
+killPlayer player = player { isDead = True }
