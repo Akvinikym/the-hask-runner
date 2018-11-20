@@ -68,12 +68,12 @@ eventsWorld _ level = level
 timingWorld :: Float -> Level -> Level
 timingWorld dt level = case (state level) of
     Playing ->  (increaseLevelVelocity (float2Double dt))
-                . playersDeaths
+                . movePlayer (float2Double dt) __player1
+                . movePlayer (float2Double dt) __player2
                 . checkDistances
                 . checkCoins __player1
                 . checkCoins __player2
-                . movePlayer (float2Double dt) __player1
-                . movePlayer (float2Double dt) __player2
+                . playersDeaths
                 $ level
     _       -> level
   where
