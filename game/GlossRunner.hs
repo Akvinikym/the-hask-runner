@@ -4,7 +4,7 @@ import GHC.Float
 import Graphics.Gloss
 import Graphics.Gloss.Interface.Pure.Game
 import HaskRunner.Core
-import HaskRunner.Drawers.GlossDrawer
+import HaskRunner.Graphics.GlossDrawer
 import HaskRunner.Generation.Generator
 import HaskRunner.ObjectsHandlers.LevelHandler
 import HaskRunner.ObjectsHandlers.PlayerHandler
@@ -21,23 +21,25 @@ initialWorld
     = Level
         initialPlayer1
         initialPlayer2
-        (objectGenerator 23543)
+        (objectGenerator 2353)
         levelEdges
         100
         Playing
         0.1
   where
-    initialPlayer1 = Player (Bounds
+    initialPlayer1 = Player "Player 1"
+      (Bounds
         (Point (-1) 3)
         (Point 1 3)
         (Point 1 (1))
-        (Point (-1) (1))) 0 0 True 0 False
+        (Point (-1) (1))) 0 0 True 0 0 False
 
-    initialPlayer2 = Player (Bounds
+    initialPlayer2 = Player "Player 2"
+      (Bounds
         (Point (-1) (-1))
         (Point 1 (-1))
         (Point 1 (-3))
-        (Point (-1) (-3))) 0 0 True 0 False
+        (Point (-1) (-3))) 0 0 True 0 0 False
 
 eventsWorld :: Event -> Level -> Level
 -- eventsWorld _ =
@@ -67,6 +69,7 @@ timingWorld :: Float -> Level -> Level
 timingWorld dt level = case (state level) of
     Playing ->  (increaseLevelVelocity (float2Double dt))
                 . playersDeaths
+                . checkDistances
                 . checkCoins __player1
                 . checkCoins __player2
                 . movePlayer (float2Double dt) __player1

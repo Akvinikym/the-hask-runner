@@ -1,4 +1,4 @@
-module HaskRunner.Drawers.GlossDrawer where
+module HaskRunner.Graphics.GlossDrawer where
 
 import GHC.Float
 import Graphics.Gloss
@@ -62,7 +62,9 @@ drawScore level = scale 0.6 0.6 (translate score1X score1Y score1Pic)
     score2Y = double2Float (635)
 
 drawPlayer :: Player -> Picture
-drawPlayer player = drawRectangularObject (pbounds player) green
+drawPlayer player
+    | isDead player = blank
+    | otherwise     = drawRectangularObject (pbounds player) green
 
 drawRectangularObject :: Bounds -> Color -> Picture
 drawRectangularObject bounds c

@@ -35,13 +35,18 @@ data GameState =
 
 -- player of the game
 data Player = Player
-  {  pbounds       :: Bounds    -- ^ players position
+  {  name          :: String    -- ^ player's name
+  ,  pbounds       :: Bounds    -- ^ players position
   ,  pHorVelocity  :: Velocity  -- ^ player's horizontal velocity
   ,  pVertVelocity :: Velocity  -- ^ player's vertical velocity
   ,  gravityIsDown :: Bool      -- ^ true, if gravity is upside-down
   ,  lilcoins      :: Int       -- ^ number of coins player collected
+  ,  distance      :: Int       -- ^ distance the player travelled
   ,  isDead        :: Bool      -- ^ is the player dead?
-  } deriving (Show, Eq)
+  } deriving (Show)
+
+instance Eq Player where 
+    p1 == p2 = name p1 == name p2
 
 
 -- rectangular bounds of the object
@@ -145,8 +150,8 @@ levelEdges = [bottomWall, leftWall, upWall]
 
 -- calculate total score of the player
 gameScore :: Level -> Player -> Integer
-gameScore level player
-    = toInteger ((floor (levelPos level)) - 100 + (100 * (lilcoins player)))
+gameScore _ player
+    = toInteger (distance player - 100 + (10 * (lilcoins player)))
 
 objectsOnScreen :: Level -> [GameObject]
 objectsOnScreen level
