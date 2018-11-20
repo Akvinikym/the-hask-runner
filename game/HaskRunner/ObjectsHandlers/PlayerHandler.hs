@@ -54,25 +54,29 @@ playerDied level player = any deadCollision (objectsOnScreen level <> edges leve
     currentAbsPos = absolutePosition (levelPos level) playerBounds
     absPos = moveBounds currentAbsPos (horizontalAcceleration, pVertVelocity player)
 
--- add points if player has picked up any coins and remove these coins from the game
+-- add coin if player has picked any and remove this coin from the game
 checkCoins :: Player -> Level -> Level
 checkCoins player level
-    | player == player1 level
-        = level { player1 = __player1, levelMap = lmap}
+    | player == __player1
+        = level { player1 = __player1 {lilcoins = coins}, levelMap = lmap}
     | otherwise
-        = level { player2 = __player2, levelMap = lmap}
+        = level { player2 = __player2 {lilcoins = coins}, levelMap = lmap}
   where
     __player1 = player1 level
     __player2 = player2 level
 
     lmap = deleteBy coinCollision undefined (levelMap level)
-    coins = if any (coinCollision undefined) (objectsOnScreen level) then (lilcoins player) + 1 else lilcoins player
+    coins = if any (coinCollision undefined) (objectsOnScreen level) then 
+            (lilcoins player) + 1 
+        else 
+            lilcoins player
     coinCollision _ object
         = collided absPos (bounds object)
           && (objectType object) == Coin
     playerBounds = pbounds player
     currentAbsPos = absolutePosition (levelPos level) playerBounds
-    absPos = moveBounds currentAbsPos (horizontalAcceleration, pVertVelocity player)
+    absPos 
+        = moveBounds currentAbsPos (horizontalAcceleration, pVertVelocity player)
 
 -- add the current level distance to players' ones, if they're not dead
 checkDistances :: Level -> Level

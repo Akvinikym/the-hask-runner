@@ -17,17 +17,20 @@ increaseLevelVelocity dt level = level {
 playersDeaths :: Level -> Level
 playersDeaths level
     | isDead __player1 && isDead __player2 = level { state = Dead }
-    | otherwise
-        = level 
-        { player1 = playerDeath __player1 level
-        , player2 = playerDeath __player2 level
-        }
+    | otherwise                            = level
   where
     __player1 = player1 level
     __player2 = player2 level
 
 -- check, if player died; if so, update him accordingly
-playerDeath :: Player -> Level -> Player
-playerDeath player level
-    | playerDied level player = killPlayer player
-    | otherwise               = player
+checkPlayerDeath :: Player -> Level -> Level
+checkPlayerDeath player level
+    | playerDied level player =
+        if (player == __player1) then
+            level { player1 = killPlayer player }
+        else
+            level { player2 = killPlayer player }
+    | otherwise               = level
+  where
+    __player1 = player1 level
+    __player2 = player2 level

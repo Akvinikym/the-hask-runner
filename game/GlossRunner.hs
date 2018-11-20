@@ -43,7 +43,6 @@ initialWorld
         (Point (-1) (-3))) 0 0 True 0 0 False
 
 eventsWorld :: Event -> Level -> Level
--- eventsWorld _ =
 eventsWorld (EventKey (SpecialKey KeySpace) Down _ _) level
   | (state level) == Playing = newLevel
   | otherwise                = level
@@ -70,12 +69,14 @@ timingWorld :: Float -> Level -> Level
 timingWorld dt level = case (state level) of
     Playing ->  (increaseLevelVelocity (float2Double dt))
                 . playersDeaths
+                . checkPlayerDeath __player1
+                . checkPlayerDeath __player2
                 . checkDistances
-                . checkCoins __player1
-                . checkCoins __player2
                 . checkDoors
                 . checkButtons __player1
                 . checkButtons __player2
+                . checkCoins __player1
+                . checkCoins __player2
                 . movePlayer (float2Double dt) __player1
                 . movePlayer (float2Double dt) __player2
                 $ level
