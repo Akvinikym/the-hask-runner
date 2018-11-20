@@ -1,10 +1,8 @@
-cabal-version: 1.12
-
--- This file has been generated from package.yaml by hpack version 0.31.0.
+-- This file has been generated from package.yaml by hpack version 0.28.2.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 10e82c7b9a141db97003f2c7caaf0767270772e45fbe1f42e3e756235d5ebfb5
+-- hash: 8cf14a507710a8383a3e667b469041212770942d612df85becc923e0ead9fdd1
 
 name:           the-hask-runner
 version:        0.1.0
@@ -18,6 +16,7 @@ copyright:      2018 PONY
 license:        Apache-2.0
 license-file:   LICENSE
 build-type:     Simple
+cabal-version:  >= 1.10
 extra-source-files:
     package.yaml
     README.md
@@ -29,9 +28,11 @@ source-repository head
 
 library
   exposed-modules:
+      GlossRunner
       HaskRunner
       HaskRunner.Core
       HaskRunner.Generation.Generator
+      HaskRunner.GlossDrawer
       HaskRunner.Graphics.Drawers
       HaskRunner.ObjectsHandlers.GameObjectsHandler
       HaskRunner.ObjectsHandlers.LevelHandler
@@ -48,6 +49,8 @@ library
     , base >=4.7 && <5
     , codeworld-api
     , containers
+    , gloss
+    , gloss-rendering
     , random
     , random-fu
     , text
@@ -66,8 +69,10 @@ executable the-hask-runner
     , base >=4.7 && <5
     , codeworld-api
     , containers
+    , gloss
+    , gloss-rendering
     , random
     , random-fu
-    , the-hask-runner
     , text
+    , the-hask-runner
   default-language: Haskell2010

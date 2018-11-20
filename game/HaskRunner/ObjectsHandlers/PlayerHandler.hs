@@ -11,8 +11,8 @@ absolutePosition dist bounds
   = moveBounds bounds (dist, 0)
 
 -- move the players according to his velocity and gravity
-movePlayer :: Player -> Level -> Level
-movePlayer player level 
+movePlayer :: Double -> Player -> Level -> Level
+movePlayer dt player level
     | player == (player1 level) = level {player1 = newPlayer}
     | otherwise                 = level {player2 = newPlayer}
   where
@@ -27,21 +27,17 @@ movePlayer player level
     vert = pVertVelocity player
     (h, v) = adjustVelocity
       worldVel
+      dt
       currentGravity
-      (map bounds objectsOnScreen)
+      (map bounds (objectsOnScreen level <> edges level))
       currentAbsPos
       (hor, vert)
-    objectsOnScreen = takeWhile (onScreen level)
-      (dropWhile (not . (onScreen level)) (levelMap level)) <> edges level
 
 -- find out, if the player dies, collided with some obstacle
 playerDied :: Level -> Player -> Bool
-playerDied level player = any deadCollision objectsOnScreen
+playerDied level player = any deadCollision (objectsOnScreen level <> edges level)
   where
     (Level _ _ objects _ _ _ _) = level
-    objectsOnScreen
-        = takeWhile (onScreen level)
-          (dropWhile (not . (onScreen level)) (levelMap level)) <> edges level
     deadCollision object
         = (collided absPos (bounds object) || collided playerBounds (bounds object))
           && deadObject object
@@ -52,7 +48,7 @@ playerDied level player = any deadCollision objectsOnScreen
 -- add points if player has picked up any coins and remove these coins from the game
 checkCoins :: Player -> Level -> Level
 checkCoins player level
-    | player == player1 level 
+    | player == player1 level
         = level { player1 = __player1 {lilcoins = coins}, levelMap = lmap}
     | otherwise
         = level { player2 = __player2 {lilcoins = coins}, levelMap = lmap}

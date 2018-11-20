@@ -13,9 +13,16 @@ verticalSpeed = 4
 initialSpeed = 2
 playerHeight = 2.0
 meanNumberOfWalls = 10
-meanOriginOffset = 0.5
-baseOriginOffset = 6.33
-wallBase = 20.0
+minNumberOfWalls = 4
+minWallY:: Double
+minWallY = 3.5 - screenHeight 
+maxWallY :: Double
+maxWallY = screenHeight - 3.5 
+yLevels :: Int
+yLevels = 5
+meanOriginOffset = 1.5
+baseOriginOffset = 7.33
+wallBase = 7.0
 meanWallLength = 1.0
 meanNumberOfSpikes :: Int
 meanNumberOfSpikes = 5
@@ -38,23 +45,23 @@ phi_inverse p | p < 0.5 = - rational_approx( sqrt (-2.0*log(p)))
 --     drawGame = drawObjects . objectGenerator
 -- -}
 objectGenerator :: Int -> [GameObject]
-objectGenerator s = foldr (++) [] (levelGenerator s)
+objectGenerator s = concat (levelGenerator s)
 
 
 -- -- Objects at the start of the level
 -- TODO Change to lowest possible platform and top platform
 safeZone :: Double -> [GameObject]
 safeZone xOrigin = [ GameObject (Bounds
-        (Point xOrigin screenHeight)
-        (Point (xOrigin + 10) screenHeight)
-        (Point (xOrigin + 10) (screenHeight - 2))
-        (Point xOrigin (screenHeight - 2))) Platform,
+        (Point xOrigin (screenHeight - 2.0))
+        (Point (xOrigin + 10) (screenHeight - 2.0))
+        (Point (xOrigin + 10) (screenHeight - 3.5))
+        (Point xOrigin (screenHeight - 3.5))) Platform,
 
     GameObject (Bounds
-        (Point xOrigin (2 - screenHeight))
-        (Point (xOrigin + 10) (1 - screenHeight))
-        (Point (xOrigin + 10) (- screenHeight))
-        (Point xOrigin (-screenHeight))) Platform ]
+        (Point xOrigin (3.5 - screenHeight ))
+        (Point (xOrigin + 10) (3.5 - screenHeight ))
+        (Point (xOrigin + 10) (2 - screenHeight  ))
+        (Point xOrigin (2 - screenHeight  ))) Platform ]
 
 -- Infinite list of gameObj batches
 levelGenerator :: Int -> [[GameObject]]
@@ -97,20 +104,15 @@ getFeasibleRandomWalls s xOrigin = head $ dropWhile (not.isFeasible) (map (\s ->
             seeds =  (randoms g :: [Int])
 
 -- -- Randomly generate walls
--- --  1. Consider player size (Done)
--- --  2. Consider player speed (?)
--- --  3. Consider previous walls (?) (min delta between walls)
 generateRandomWalls :: Int -> Double -> [GameObject]
 generateRandomWalls s xOrigin = zipWith3 makeWall platformXOrigins platformYOrigins platformLenghts
         where
-            yLevels :: Int
-            yLevels = 6
             normalRvs = map phi_inverse (randomRs (0.0, 1.0) (mkStdGen s))
             uniformRvs = randomRs (0, yLevels) (mkStdGen s)
-            numberOfWalls = round (meanNumberOfWalls * (head normalRvs))
-            platformLenghts = map (\x -> x * meanWallLength + wallBase) (take numberOfWalls (drop 1 normalRvs))
-            platformYOrigins = map (\x -> ((screenHeight*2) / (fromIntegral yLevels)) * (fromIntegral x) - screenHeight) (take numberOfWalls uniformRvs)
-            platformXOrigins = scanl (+) xOrigin (map (\x -> baseOriginOffset + meanOriginOffset * x) (take numberOfWalls (drop (1 + numberOfWalls) normalRvs)))
+            numberOfWalls = round (min (meanNumberOfWalls + meanNumberOfWalls * (head normalRvs)) minNumberOfWalls)
+            platformLenghts = map (\x -> x * meanWallLength + wallBase) (take numberOfWalls normalRvs)
+            platformYOrigins = map (\x -> ( (fromIntegral(x) / fromIntegral(yLevels)) * (maxWallY - minWallY) + minWallY)) (take numberOfWalls uniformRvs)
+            platformXOrigins = scanl (+) xOrigin (map (\x -> baseOriginOffset + meanOriginOffset * x) (take numberOfWalls normalRvs))
 
 
 
@@ -119,9 +121,9 @@ makeSpike x y = GameObject bounds Spikes
     where
         bounds = Bounds p1 p2 p3 p4
         p1 = Point x y
-        p2 = Point (x + 1) y
-        p3 = Point (x + 1) (y - 1)
-        p4 = Point x (y - 1)
+        p2 = Point (x + 0.5) y
+        p3 = Point (x + 0.5) (y - 0.5)
+        p4 = Point x (y - 0.5)
 
 makeCoin :: Double -> Double -> GameObject
 makeCoin x y = GameObject bounds Coin
@@ -135,12 +137,10 @@ makeCoin x y = GameObject bounds Coin
 generateRandomSpikes :: Int -> Double -> [GameObject]
 generateRandomSpikes s xOrigin = zipWith makeSpike platformXOrigins platformYOrigins
         where
-            yLevels :: Int
-            yLevels = 6
             uniformRvs = randomRs (0, yLevels - 1) (mkStdGen s)
             numberOfspikes = meanNumberOfSpikes
-            xPositions = map (6.32 * ) [0, 1/ (fromIntegral numberOfspikes) .. 1]
-            platformYOrigins = map (\x -> ((screenHeight*2) / (fromIntegral yLevels)) * (fromIntegral x) - screenHeight + 1.5) (take numberOfspikes uniformRvs)
+            xPositions = map (wallBase * ) [0, 1 .. ]
+            platformYOrigins = map (\x -> ( (fromIntegral(x) / fromIntegral(yLevels)) * (maxWallY - minWallY) + minWallY) - 0.5) (take numberOfspikes uniformRvs)
             platformXOrigins = map (xOrigin +)  xPositions
 
 
