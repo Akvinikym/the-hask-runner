@@ -26,6 +26,7 @@ initialWorld
         100
         Playing
         0.1
+        []
   where
     initialPlayer1 = Player "Player 1"
       (Bounds
@@ -74,6 +75,9 @@ timingWorld dt level = case (state level) of
                 . checkCoins __player1
                 . checkCoins __player2
                 . playersDeaths
+                . checkDoors
+                . checkButtons __player1
+                . checkButtons __player2
                 $ level
     _       -> level
   where

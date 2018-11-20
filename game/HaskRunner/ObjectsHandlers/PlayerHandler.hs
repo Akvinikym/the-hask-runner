@@ -3,6 +3,7 @@ module HaskRunner.ObjectsHandlers.PlayerHandler where
 import HaskRunner.Core
 import HaskRunner.Physics
 import Data.List
+import Data.Maybe
 
 -- | Player's objects supply functions
 
@@ -45,7 +46,7 @@ movePlayer dt player level
 playerDied :: Level -> Player -> Bool
 playerDied level player = any deadCollision (objectsOnScreen level <> edges level)
   where
-    (Level _ _ objects _ _ _ _) = level
+    (Level _ _ objects _ _ _ _ _) = level
     deadCollision object
         = (collided absPos (bounds object) || collided playerBounds (bounds object))
           && deadObject object
@@ -56,10 +57,10 @@ playerDied level player = any deadCollision (objectsOnScreen level <> edges leve
 -- add points if player has picked up any coins and remove these coins from the game
 checkCoins :: Player -> Level -> Level
 checkCoins player level
-    | player == __player1
-        = level { player1 = __player1 {lilcoins = coins}, levelMap = lmap}
+    | player == player1 level
+        = level { player1 = __player1, levelMap = lmap}
     | otherwise
-        = level { player2 = __player2 {lilcoins = coins}, levelMap = lmap}
+        = level { player2 = __player2, levelMap = lmap}
   where
     __player1 = player1 level
     __player2 = player2 level
@@ -93,3 +94,32 @@ checkDistances level = level
 -- kill the player
 killPlayer :: Player -> Player
 killPlayer player = player { isDead = True }
+
+
+-- openDoor if player has pressed button  and remove this button from the game
+checkDoors :: Level -> Level
+checkDoors level = level {levelMap = lmap}
+    where
+      lmap = deleteBy doorCheck undefined (levelMap level)
+      doorCheck _ (GameObject b (Door d)) = elem d (doorsOpened level)
+      doorCheck _ _ = False
+
+-- openDoor if player has pressed button  and remove this button from the game
+checkButtons :: Player -> Level -> Level
+checkButtons player level = level { doorsOpened = __openedDoors, levelMap = lmap}
+    where
+      lmap = deleteBy buttonCollision undefined (levelMap level)
+      buttonsCollided = filter (buttonCollision undefined) objectsOnScreen
+      __openedDoors = (doorsOpened level) ++ (catMaybes (map getButtonId buttonsCollided))
+      getButtonId :: GameObject -> Maybe Double
+      getButtonId (GameObject b (Button id)) =  Just id
+      getButtonId _ = Nothing
+      buttonCollision :: a -> GameObject -> Bool
+      buttonCollision _ (GameObject b (Button _)) = collided absPos b
+      buttonCollision _ _ = False
+      objectsOnScreen
+          = takeWhile (onScreen level)
+            (dropWhile (not . (onScreen level)) (levelMap level))
+      playerBounds = pbounds player
+      currentAbsPos = absolutePosition (levelPos level) playerBounds
+      absPos = moveBounds currentAbsPos (horizontalAcceleration, pVertVelocity player)

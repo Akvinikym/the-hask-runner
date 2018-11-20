@@ -25,6 +25,7 @@ data Level = Level
     , levelPos      :: Double     -- ^ position of the level screen
     , state         :: GameState  -- ^ current state of the game
     , horVelocity   :: Velocity   -- ^ world's horizontal velocity
+    , doorsOpened   :: [Double]   -- ^ opened doors ids
     } deriving (Show)
 
 data GameState =
@@ -105,12 +106,16 @@ data GameObject = GameObject
     , objectType   :: ObjectType
     }  deriving (Show)
 
+
+
 -- type of what can be generated
 data ObjectType =
     Platform    -- ^ rectangular platform, on which player can stand
     | Wall      -- ^ borders of the game
     | Spikes    -- ^ death-bringing obstacle
     | Coin      -- ^ source of additional points
+    | Button Double   -- ^ opens doors
+    | Door   Double         -- ^ openable platform
     deriving (Eq, Show)
 
 -- if collision with object causes death
