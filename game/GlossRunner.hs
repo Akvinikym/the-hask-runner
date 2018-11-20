@@ -21,11 +21,12 @@ initialWorld
     = Level
         initialPlayer1
         initialPlayer2
-        (objectGenerator 23543)
+        (objectGenerator 23343)
         levelEdges
         100
         Playing
         0.1
+        []
   where
     initialPlayer1 = Player (Bounds
         (Point (-1) 3)
@@ -70,6 +71,9 @@ timingWorld dt level = case (state level) of
                 -- . playerDeath __player2
                 . checkCoins __player1
                 . checkCoins __player2
+                . checkDoors
+                . checkButtons __player1
+                . checkButtons __player2
                 . movePlayer (float2Double dt) __player1
                 . movePlayer (float2Double dt) __player2
                 $ level

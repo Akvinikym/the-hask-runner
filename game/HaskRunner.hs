@@ -25,6 +25,7 @@ initialWorld
         100
         Playing
         0.1
+        []
   where
     initialPlayer1 = Player (Bounds
         (Point (-1) 3)
