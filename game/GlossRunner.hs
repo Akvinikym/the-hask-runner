@@ -21,7 +21,7 @@ initialWorld
     = Level
         initialPlayer1
         initialPlayer2
-        (objectGenerator 2353)
+        (objectGenerator 42353)
         levelEdges
         100
         Playing
@@ -69,15 +69,15 @@ eventsWorld _ level = level
 timingWorld :: Float -> Level -> Level
 timingWorld dt level = case (state level) of
     Playing ->  (increaseLevelVelocity (float2Double dt))
-                . movePlayer (float2Double dt) __player1
-                . movePlayer (float2Double dt) __player2
+                . playersDeaths
                 . checkDistances
                 . checkCoins __player1
                 . checkCoins __player2
-                . playersDeaths
                 . checkDoors
                 . checkButtons __player1
                 . checkButtons __player2
+                . movePlayer (float2Double dt) __player1
+                . movePlayer (float2Double dt) __player2
                 $ level
     _       -> level
   where
