@@ -4,7 +4,7 @@ import GHC.Float
 import Graphics.Gloss
 import Graphics.Gloss.Interface.Pure.Game
 import HaskRunner.Core
-import HaskRunner.GlossDrawer
+import HaskRunner.Drawers.GlossDrawer
 import HaskRunner.Generation.Generator
 import HaskRunner.ObjectsHandlers.LevelHandler
 import HaskRunner.ObjectsHandlers.PlayerHandler

@@ -1,4 +1,4 @@
-module HaskRunner.GlossDrawer where
+module HaskRunner.Drawers.GlossDrawer where
 
 import GHC.Float
 import Graphics.Gloss
@@ -10,9 +10,7 @@ scaleFactor = 25
 
 drawLevel :: Level -> Picture
 drawLevel level = case (state level) of
-    -- Playing  -> drawFullLevel level
     Playing -> drawFullLevel level
-    -- Dead     -> drawGameOverScreen level
     Dead -> drawGameOverScreen level
     MainMenu -> drawMainMenu level
 
