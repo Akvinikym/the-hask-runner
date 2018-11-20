@@ -36,14 +36,10 @@ drawGameOverScreen level
 
 drawFullLevel :: Level -> Picture
 drawFullLevel level =
-    scale scaleFactor scaleFactor ((drawPlayer (player1 level))
-    <> (drawPlayer (player2 level))
+    scale scaleFactor scaleFactor ((drawPlayer level (player1 level))
+    <> (drawPlayer level (player2 level))
     <> foldMap (drawObject (levelPos level)) (objectsOnScreen level)
     <> foldMap (drawObject 0) (edges level)) <> drawScore level
-  where
-      -- objectsOnScreen
-      --   = takeWhile (onScreen level)
-      --     (dropWhile (not . (onScreen level)) (levelMap level))
 
 drawScore :: Level -> Picture
 drawScore level = scale 0.6 0.6 (translate score1X score1Y score1Pic)
@@ -61,10 +57,14 @@ drawScore level = scale 0.6 0.6 (translate score1X score1Y score1Pic)
     score2X = double2Float (300)
     score2Y = double2Float (635)
 
-drawPlayer :: Player -> Picture
-drawPlayer player
-    | isDead player = blank
-    | otherwise     = drawRectangularObject (pbounds player) green
+drawPlayer :: Level -> Player -> Picture
+drawPlayer level player
+    | isDead player 
+        = blank
+    | player == (player1 level) 
+        = drawRectangularObject (pbounds player) green
+    | otherwise 
+        = drawRectangularObject (pbounds player) blue 
 
 drawRectangularObject :: Bounds -> Color -> Picture
 drawRectangularObject bounds c

@@ -63,11 +63,6 @@ checkCoins player level
   where
     __player1 = player1 level
     __player2 = player2 level
-    
-    -- coins1 = findCoins __player1
-    -- coins2 = findCoins __player2
-
-    -- findCoins __player = 
 
     lmap = deleteBy coinCollision undefined (levelMap level)
     coins = if any (coinCollision undefined) (objectsOnScreen level) then (lilcoins player) + 1 else lilcoins player
