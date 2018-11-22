@@ -38,9 +38,13 @@ movePlayer dt player level
       worldVel
       dt
       currentGravity
-      (map bounds (objectsOnScreen level <> edges level))
+      (map bounds (objectOnScreenWithoutCoins <> edges level))
       currentAbsPos
       (hor, vert)
+
+      where
+        objectOnScreenWithoutCoins
+            = filter ((/= Coin) . objectType) (objectsOnScreen level)
 
 -- find out, if the player dies, collided with some obstacle
 playerDied :: Level -> Player -> Bool
