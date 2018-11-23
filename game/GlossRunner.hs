@@ -51,7 +51,30 @@ initialWorld
         (Point (-1) (-3))) 0 0 True 0 0 False
 
 eventsWorldIO :: Event -> Level -> IO Level
-eventsWorldIO e l = return (eventsWorld e l)
+eventsWorldIO event level
+  | spaceEvent event = case state level of
+      Dead name -> if length name < 5 then return (eventsWorld event level) else uploadScore name level
+      _ -> return (eventsWorld event level)
+  | escEvent event = case state level of
+      Dead name -> return (level {state = MainMenu})
+  | otherwise = return (eventsWorld event level)
+
+uploadScore :: String -> Level -> IO Level
+uploadScore name level = do
+  req <- parseRequest request
+  resp <- httpBS req
+  return (level {state = MainMenu})
+    where
+      request = "http://localhost:3000/set_score/" <> name <> "/" <> (show score)
+      score = gameScore level (player1 level)
+
+spaceEvent :: Event -> Bool
+spaceEvent (EventKey (SpecialKey KeySpace) Down _ _) = True
+spaceEvent _ = False
+
+escEvent :: Event -> Bool
+escEvent (EventKey (SpecialKey KeyEsc) Down _ _) = True
+escEvent _ = False
 
 eventsWorld :: Event -> Level -> Level
 eventsWorld (EventKey (SpecialKey KeySpace) Down _ _) level
@@ -68,9 +91,6 @@ eventsWorld (EventKey (Char '.') Down _ _) level
     __player2 = player2 level
     newLevel = level {
         player2 = __player2 {gravityIsDown = not (gravityIsDown __player2)} }
-eventsWorld (EventKey (Char 'r') Down _ _) level
-    | (state level) == Dead = initialWorld
-    | otherwise             = level
 eventsWorld (EventKey (Char 's') Down _ _) level
     | (state level) == MainMenu = initialWorld
     | otherwise                 = level
@@ -80,11 +100,27 @@ eventsWorld (EventKey (Char 't') Down _ _) level
 eventsWorld (EventKey (Char 'e') Down _ _) level
     | isScoreScreen level = initialWorld {state = MainMenu}
     | otherwise                 = level
+eventsWorld (EventKey (Char c) Down _ _) level
+  | isDeadState level = addCharToName level c
+  | otherwise = level
 eventsWorld _ level = level
+
+addCharToName :: Level -> Char -> Level
+addCharToName level c = case state level of
+  Dead name -> level {state = (Dead newName)}
+    where
+      newName = if length name < 5 then name ++ [c] else name
+  _ -> level
+
 
 isScoreScreen :: Level -> Bool
 isScoreScreen level = case state level of
   ScoreScreen _ _ -> True
+  _ -> False
+
+isDeadState :: Level -> Bool
+isDeadState level = case state level of
+  Dead _ -> True
   _ -> False
 
 timingWorldIO :: Float -> Level -> IO Level

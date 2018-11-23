@@ -34,7 +34,7 @@ data Level = Level
 data GameState =
     MainMenu
     | Playing
-    | Dead
+    | Dead String
     | ScoreScreen Bool [Score]
     deriving (Show, Eq)
 

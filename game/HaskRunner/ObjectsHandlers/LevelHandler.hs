@@ -16,7 +16,7 @@ increaseLevelVelocity dt level = level {
 
 playersDeaths :: Level -> Level
 playersDeaths level
-    | isDead __player1 && isDead __player2 = level { state = Dead }
+    | isDead __player1 && isDead __player2 = level { state = Dead "" }
     | otherwise                            = level
   where
     __player1 = player1 level

@@ -11,7 +11,7 @@ scaleFactor = 25
 drawLevel :: Level -> Picture
 drawLevel level = case (state level) of
     Playing -> drawFullLevel level
-    Dead -> drawGameOverScreen level
+    Dead name -> drawGameOverScreen level name
     MainMenu -> drawMainMenu level
     ScoreScreen _ scores -> translate (-200) 350 (drawScoreScreen scores)
 
@@ -23,17 +23,26 @@ drawMainMenu _
 drawTextLine :: String -> Picture
 drawTextLine text = scale 0.4 0.4 (Text text)
 
-drawGameOverScreen :: Level -> Picture
-drawGameOverScreen level
+drawGameOverScreen :: Level -> String -> Picture
+drawGameOverScreen level name
   = translate (-400) 0 $ (drawTextLine finalMessage)
     <> (translate 0 (-100) (drawTextLine finalScore1))
     <> (translate 0 (-200) (drawTextLine finalScore2))
+    <> (translate 0 (-300) (drawTextLine "Enter your name:"))
+    <> (translate 50 (-400) (drawTextLine (drawName name)))
   where
     score1 = gameScore level (player1 level)
     score2 = gameScore level (player2 level)
-    finalMessage = "Game Over! Press 'R' to restart"
+    finalMessage = "Game Over! Press Space to restart"
     finalScore1 = "Final score of player 1: " ++  show score1
     finalScore2 = "Final score of player 2: " ++  show score2
+    drawName :: [Char] -> [Char]
+    drawName [] = "_ _ _ _ _"
+    drawName [a] = [a] ++ " _ _ _ _"
+    drawName [a, b] = [a] ++ " " ++ [b] ++ " _ _ _"
+    drawName [a, b, c] = [a] ++ " " ++ [b] ++ " " ++ [c] ++ " _ _"
+    drawName [a, b, c, d] = [a] ++ " " ++ [b] ++ " " ++ [c] ++ " " ++ [d] ++ " _"
+    drawName [a, b, c, d, e] = [a] ++ " " ++ [b] ++ " " ++ [c] ++ " " ++ [d] ++ " " ++ [e]
 
 drawFullLevel :: Level -> Picture
 drawFullLevel level =
@@ -96,4 +105,6 @@ drawScoreScreen (s:ss)
   = drawBoardScore s <> (translate 0 (-100) (drawScoreScreen ss))
 
 drawBoardScore :: Score -> Picture
-drawBoardScore s = drawTextLine ((pname s) <> "     " <> (show (score s)))
+drawBoardScore s = drawTextLine (name <> "     " <> (show (score s)))
+  where
+    name = Prelude.filter (/='\"') (pname s)
