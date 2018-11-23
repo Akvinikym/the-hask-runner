@@ -17,7 +17,7 @@ import Data.Char
 import Data.Monoid (mconcat)
 
 data Score = Score {
-    name :: String
+    pname :: String
   , score :: Integer
 } deriving (Generic)
 

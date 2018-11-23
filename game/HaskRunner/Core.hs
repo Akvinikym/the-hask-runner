@@ -1,5 +1,8 @@
+{-# LANGUAGE DeriveGeneric #-}
 module HaskRunner.Core where
 
+import GHC.Generics
+import qualified Data.Aeson as A
 -- | Contains general-purpose data types and functions
 
 -- size of the playable area
@@ -32,6 +35,7 @@ data GameState =
     MainMenu
     | Playing
     | Dead
+    | ScoreScreen Bool [Score]
     deriving (Show, Eq)
 
 -- player of the game
@@ -46,7 +50,7 @@ data Player = Player
   ,  isDead        :: Bool      -- ^ is the player dead?
   } deriving (Show)
 
-instance Eq Player where 
+instance Eq Player where
     p1 == p2 = name p1 == name p2
 
 
@@ -162,3 +166,17 @@ objectsOnScreen :: Level -> [GameObject]
 objectsOnScreen level
   = take 50
     (dropWhile (not . (onScreen level)) (levelMap level))
+
+data Score = Score
+  { pname :: String
+  , score :: Integer
+  } deriving (Generic, Show, Eq)
+
+instance A.ToJSON Score where
+    -- No need to provide a toJSON implementation.
+
+    -- For efficiency, we write a simple toEncoding implementation, as
+    -- the default version uses toJSON.
+  toEncoding = A.genericToEncoding A.defaultOptions
+
+instance A.FromJSON Score

@@ -13,6 +13,7 @@ drawLevel level = case (state level) of
     Playing -> drawFullLevel level
     Dead -> drawGameOverScreen level
     MainMenu -> drawMainMenu level
+    ScoreScreen _ scores -> translate (-200) 0 (drawScoreScreen scores)
 
 drawMainMenu :: Level -> Picture
 drawMainMenu _
@@ -59,12 +60,12 @@ drawScore level = scale 0.6 0.6 (translate score1X score1Y score1Pic)
 
 drawPlayer :: Level -> Player -> Picture
 drawPlayer level player
-    | isDead player 
+    | isDead player
         = blank
-    | player == (player1 level) 
+    | player == (player1 level)
         = drawRectangularObject (pbounds player) green
-    | otherwise 
-        = drawRectangularObject (pbounds player) blue 
+    | otherwise
+        = drawRectangularObject (pbounds player) blue
 
 drawRectangularObject :: Bounds -> Color -> Picture
 drawRectangularObject bounds c
@@ -88,3 +89,11 @@ drawObject offset (GameObject bounds (Button _))
     = translate (double2Float (-offset)) 0 (drawRectangularObject bounds blue)
 drawObject offset (GameObject bounds (Door _))
     = translate (double2Float (-offset)) 0 (drawRectangularObject bounds blue)
+
+drawScoreScreen :: [Score] -> Picture
+drawScoreScreen [] = blank
+drawScoreScreen (s:ss)
+  = drawBoardScore s <> (translate 0 (-100) (drawScoreScreen ss))
+
+drawBoardScore :: Score -> Picture
+drawBoardScore s = drawTextLine ((pname s) <> "     " <> (show (score s)))
