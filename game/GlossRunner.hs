@@ -10,6 +10,7 @@ import HaskRunner.ObjectsHandlers.LevelHandler
 import HaskRunner.ObjectsHandlers.PlayerHandler
 import HaskRunner.ObjectsHandlers.GameObjectsHandler
 import Network.HTTP.Simple
+import Data.List
 import qualified Data.ByteString.Char8 as B8
 import qualified Data.ByteString.Lazy as BSL
 import qualified Data.Aeson as A
@@ -91,7 +92,8 @@ timingWorldIO dt level = case (state level) of
   ScoreScreen False _ -> do
     resp <- httpBS "http://localhost:3000/score"
     let scores = parseResponse (BSL.fromStrict (getResponseBody resp))
-    return level {state = ScoreScreen True scores}
+    let topScores = ((take 10) . reverse . (sortOn score)) scores
+    return level {state = ScoreScreen True topScores}
       where
         parseResponse resp = case A.decode resp :: Maybe [Score] of
           Nothing -> []

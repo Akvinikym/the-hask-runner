@@ -13,7 +13,7 @@ drawLevel level = case (state level) of
     Playing -> drawFullLevel level
     Dead -> drawGameOverScreen level
     MainMenu -> drawMainMenu level
-    ScoreScreen _ scores -> translate (-200) 0 (drawScoreScreen scores)
+    ScoreScreen _ scores -> translate (-200) 350 (drawScoreScreen scores)
 
 drawMainMenu :: Level -> Picture
 drawMainMenu _
