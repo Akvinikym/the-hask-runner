@@ -74,9 +74,17 @@ eventsWorld (EventKey (Char 's') Down _ _) level
     | (state level) == MainMenu = initialWorld
     | otherwise                 = level
 eventsWorld (EventKey (Char 't') Down _ _) level
-    | (state level) == MainMenu || (state level) == Dead = level {state = ScoreScreen False []}
+    | (state level) == MainMenu = level {state = ScoreScreen False []}
+    | otherwise                 = level
+eventsWorld (EventKey (Char 'e') Down _ _) level
+    | isScoreScreen level = initialWorld {state = MainMenu}
     | otherwise                 = level
 eventsWorld _ level = level
+
+isScoreScreen :: Level -> Bool
+isScoreScreen level = case state level of
+  ScoreScreen _ _ -> True
+  _ -> False
 
 timingWorldIO :: Float -> Level -> IO Level
 timingWorldIO dt level = case (state level) of
