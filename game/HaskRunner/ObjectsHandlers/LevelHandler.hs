@@ -34,3 +34,9 @@ checkPlayerDeath player level
   where
     __player1 = player1 level
     __player2 = player2 level
+
+-- launch game in one players mode
+onePlayer :: Level -> Level
+onePlayer level = level {player2 = __player2 {isDead = True, distance = 100} }
+  where
+    __player2 = player2 level
