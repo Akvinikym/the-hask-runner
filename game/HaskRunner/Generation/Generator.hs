@@ -9,7 +9,6 @@ type Seed = Double
 
 -- | TODO: take from Core
 verticalSpeed = 4
--- screenHeight = 12
 initialSpeed = 2
 playerHeight = 2.0
 meanNumberOfWalls = 10
@@ -38,17 +37,11 @@ phi_inverse :: Double -> Double
 phi_inverse p | p < 0.5 = - rational_approx( sqrt (-2.0*log(p)))
               | otherwise = rational_approx( sqrt (-2.0*log(1.0 - p)))
 
--- {-|
--- Generate infinite list if objects from random seed
--- Example use in drawing:
---     drawGame :: Game -> Picture
---     drawGame = drawObjects . objectGenerator
--- -}
 objectGenerator :: Int -> [GameObject]
 objectGenerator s = concat (levelGenerator s)
 
 
--- -- Objects at the start of the level
+-- Objects at the start of the level
 -- TODO Change to lowest possible platform and top platform
 safeZone :: Double -> [GameObject]
 safeZone xOrigin = [ GameObject (Bounds
