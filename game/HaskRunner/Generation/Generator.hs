@@ -77,8 +77,8 @@ makeVerticalWall :: Double -> Double -> Double -> GameObject
 makeVerticalWall x y l = GameObject bounds Platform
     where
         bounds = Bounds p1 p2 p3 p4
-        p1 = Point x (y + l)
-        p2 = Point (x + platformHeight) (y + l)
+        p1 = Point x (y + l - 1)
+        p2 = Point (x + platformHeight) (y + l - 1)
         p3 = Point (x + platformHeight)  y
         p4 = Point x y
 
