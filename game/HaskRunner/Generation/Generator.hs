@@ -16,11 +16,13 @@ meanNumberOfWalls = 10
 minNumberOfWalls = 4
 minWallY = 3.5 - screenHeight 
 maxWallY = screenHeight - 3.5 
+yLevels :: Int
 yLevels = 5
 meanOriginOffset = 1.5
 baseOriginOffset = 7.33
 wallBase = 7.0
 meanWallLength = 1.0
+meanNumberOfSpikes :: Int
 meanNumberOfSpikes = 5
 -- |
 
