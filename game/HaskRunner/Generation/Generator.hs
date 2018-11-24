@@ -59,11 +59,10 @@ safeZone xOrigin = [ GameObject (Bounds
 levelGenerator :: Int -> [[GameObject]]
 levelGenerator s = scanl getNextXOrigin (safeZone 0.0) objectsMix
     where
-        g = mkStdGen s
-        seedRvs =  (randoms g :: [Int])
-        walls = map generateRandomWalls seedRvs
-        spikes = map generateRandomSpikes seedRvs
-        verticalWalls = map generateRandomVerticalWalls seedRvs
+        seedRvs =  (randoms (mkStdGen s) :: [Int])
+        walls = map generateRandomWalls seedRvs 
+        spikes = map generateRandomSpikes seedRvs  
+        verticalWalls = map generateRandomVerticalWalls seedRvs 
         doors = map generateRandomDoors seedRvs
 
         zippedBatches = zip4 verticalWalls walls spikes doors
