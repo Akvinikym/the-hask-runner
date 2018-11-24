@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 5fcbef09b7e87a56f04e8aa4948348edf654e4a0780bbf6f8fd0172df24446bd
+-- hash: e12c91759df0839d5f87ba1c5e9216bdf30aab2a956c9bdcf5c66878066a3f21
 
 name:           the-hask-runner
 version:        0.1.0
@@ -45,14 +45,42 @@ library
   default-extensions: DuplicateRecordFields FlexibleContexts FlexibleInstances GeneralizedNewtypeDeriving LambdaCase NamedFieldPuns ScopedTypeVariables OverloadedStrings
   ghc-options: -Wall -fno-warn-type-defaults
   build-depends:
-      algebraic-graphs
+      aeson
+    , algebraic-graphs
     , base >=4.7 && <5
+    , bytestring
     , codeworld-api
     , containers
     , gloss
     , gloss-rendering
+    , http-conduit
     , random
     , random-fu
+    , text
+  default-language: Haskell2010
+
+executable hask-server
+  main-is: Main.hs
+  other-modules:
+      Paths_the_hask_runner
+  hs-source-dirs:
+      server
+  default-extensions: DuplicateRecordFields FlexibleContexts FlexibleInstances GeneralizedNewtypeDeriving LambdaCase NamedFieldPuns ScopedTypeVariables OverloadedStrings
+  ghc-options: -Wall -fno-warn-type-defaults
+  build-depends:
+      aeson
+    , algebraic-graphs
+    , base >=4.7 && <5
+    , bytestring
+    , codeworld-api
+    , containers
+    , gloss
+    , gloss-rendering
+    , hedis
+    , http-conduit
+    , random
+    , random-fu
+    , scotty
     , text
   default-language: Haskell2010
 
@@ -65,12 +93,15 @@ executable the-hask-runner
   default-extensions: DuplicateRecordFields FlexibleContexts FlexibleInstances GeneralizedNewtypeDeriving LambdaCase NamedFieldPuns ScopedTypeVariables OverloadedStrings
   ghc-options: -Wall -fno-warn-type-defaults -rtsopts -threaded -with-rtsopts=-N
   build-depends:
-      algebraic-graphs
+      aeson
+    , algebraic-graphs
     , base >=4.7 && <5
+    , bytestring
     , codeworld-api
     , containers
     , gloss
     , gloss-rendering
+    , http-conduit
     , random
     , random-fu
     , text
