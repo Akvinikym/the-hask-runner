@@ -23,6 +23,13 @@ dependencies:
     - random
     - random-fu
     - algebraic-graphs
+    - gloss-rendering
+    - gloss
+    - text
+    - http-conduit
+    - bytestring
+    - aeson
+
 
 default-extensions:
 - DuplicateRecordFields
@@ -48,3 +55,11 @@ executables:
     - -with-rtsopts=-N
     main: Main.hs
     source-dirs: executable
+  hask-server:
+    dependencies:
+    - scotty
+    - aeson
+    - base >=4.7 && <5
+    - hedis
+    main: Main.hs
+    source-dirs: server

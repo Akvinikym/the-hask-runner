@@ -1,5 +1,8 @@
+{-# LANGUAGE DeriveGeneric #-}
 module HaskRunner.Core where
 
+import GHC.Generics
+import qualified Data.Aeson as A
 -- | Contains general-purpose data types and functions
 
 -- size of the playable area
@@ -10,32 +13,45 @@ screenWidth = 20
 
 -- value by which vertical speed is adjusted
 baseGravity :: Double
-baseGravity = (-0.02)
+baseGravity = (-0.3)
 
 -- how fast the level accelerates
 horizontalAcceleration :: Double
-horizontalAcceleration = 0.05
+horizontalAcceleration = 0.02
 
 -- current level state; main state of the world as well
 data Level = Level
-    { player        :: Player     -- ^ player of the game
+    { player1       :: Player     -- ^ first player
+    , player2       :: Player     -- ^ second player
     , levelMap      :: Map        -- ^ collection of current game objects
     , edges         :: Map        -- ^ collection of game borders
     , levelPos      :: Double     -- ^ position of the level screen
-    , isFinished    :: Bool       -- ^ collision with obstacle occured
-    , gravityIsDown :: Bool       -- ^ true, if gravity is upside-down
+    , state         :: GameState  -- ^ current state of the game
     , horVelocity   :: Velocity   -- ^ world's horizontal velocity
-    , distance      :: Distance   -- ^ distance player travelled so far
-    , lilcoins      :: Int        -- ^ number of coins player collected
+    , doorsOpened   :: [Double]   -- ^ opened doors ids
     } deriving (Show)
 
+data GameState =
+    MainMenu
+    | Playing
+    | Dead String
+    | ScoreScreen Bool [Score]
+    deriving (Show, Eq)
 
 -- player of the game
 data Player = Player
-  {  pbounds :: Bounds         -- ^ players position
-  ,  pHorVelocity :: Velocity  -- ^ player's horizontal velocity
-  ,  pVertVelocity :: Velocity -- ^ player's vertical velocity
+  {  name          :: String    -- ^ player's name
+  ,  pbounds       :: Bounds    -- ^ players position
+  ,  pHorVelocity  :: Velocity  -- ^ player's horizontal velocity
+  ,  pVertVelocity :: Velocity  -- ^ player's vertical velocity
+  ,  gravityIsDown :: Bool      -- ^ true, if gravity is upside-down
+  ,  lilcoins      :: Int       -- ^ number of coins player collected
+  ,  distance      :: Int       -- ^ distance the player travelled
+  ,  isDead        :: Bool      -- ^ is the player dead?
   } deriving (Show)
+
+instance Eq Player where
+    p1 == p2 = name p1 == name p2
 
 
 -- rectangular bounds of the object
@@ -44,7 +60,7 @@ data Bounds = Bounds
     , topRight    :: Point
     , bottomRight :: Point
     , bottomLeft  :: Point
-    } deriving (Show)
+    } deriving (Show, Eq)
 
 -- move the bounds to some direction: for example,
 -- (-1, -1) will move the bounds left-bottom to 1 point
@@ -64,7 +80,7 @@ boundsCenter (Bounds (Point x1 y1) _ (Point x2 y2) _)
 -- find width and height of the bounds rectangle
 boundsWidthHeight :: Bounds -> (Double, Double)
 boundsWidthHeight (Bounds (Point x1 y1) _ (Point x2 y2) _)
-    = (x2 - x1, y2 - y1)
+    = (x2 - x1, y1 - y2)
 
 -- find right-most and left-most X coordinates of the bounds
 boundsLeftRightCoords :: Bounds -> (Double, Double)
@@ -75,10 +91,9 @@ boundsLeftRightCoords bounds = (leftMost, rightMost)
 
 
 data Point = Point Double Double
-    deriving (Show)
+    deriving (Show, Eq)
 
 type Map = [GameObject]
-type Distance = Double
 type Velocity = Double
 
 -- | Different generated objects: platforms or obsctacles
@@ -95,12 +110,16 @@ data GameObject = GameObject
     , objectType   :: ObjectType
     }  deriving (Show)
 
+
+
 -- type of what can be generated
 data ObjectType =
     Platform    -- ^ rectangular platform, on which player can stand
     | Wall      -- ^ borders of the game
     | Spikes    -- ^ death-bringing obstacle
     | Coin      -- ^ source of additional points
+    | Button Double   -- ^ opens doors
+    | Door   Double         -- ^ openable platform
     deriving (Eq, Show)
 
 -- if collision with object causes death
@@ -139,5 +158,25 @@ levelEdges = [bottomWall, leftWall, upWall]
         (Point (- screenWidth + 1) (screenHeight - 3))) Wall
 
 -- calculate total score of the player
-gameScore :: Level -> Integer
-gameScore level = toInteger ((floor (levelPos level)) - 100 + (100 * (lilcoins level)))
+gameScore :: Level -> Player -> Integer
+gameScore _ player
+    = toInteger (distance player - 100 + (10 * (lilcoins player)))
+
+objectsOnScreen :: Level -> [GameObject]
+objectsOnScreen level
+  = take 50
+    (dropWhile (not . (onScreen level)) (levelMap level))
+
+data Score = Score
+  { pname :: String
+  , score :: Integer
+  } deriving (Generic, Show, Eq)
+
+instance A.ToJSON Score where
+    -- No need to provide a toJSON implementation.
+
+    -- For efficiency, we write a simple toEncoding implementation, as
+    -- the default version uses toJSON.
+  toEncoding = A.genericToEncoding A.defaultOptions
+
+instance A.FromJSON Score

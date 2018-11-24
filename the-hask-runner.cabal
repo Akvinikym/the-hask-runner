@@ -1,10 +1,8 @@
-cabal-version: 1.12
-
--- This file has been generated from package.yaml by hpack version 0.31.0.
+-- This file has been generated from package.yaml by hpack version 0.28.2.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 10e82c7b9a141db97003f2c7caaf0767270772e45fbe1f42e3e756235d5ebfb5
+-- hash: e12c91759df0839d5f87ba1c5e9216bdf30aab2a956c9bdcf5c66878066a3f21
 
 name:           the-hask-runner
 version:        0.1.0
@@ -18,6 +16,7 @@ copyright:      2018 PONY
 license:        Apache-2.0
 license-file:   LICENSE
 build-type:     Simple
+cabal-version:  >= 1.10
 extra-source-files:
     package.yaml
     README.md
@@ -29,10 +28,12 @@ source-repository head
 
 library
   exposed-modules:
+      GlossRunner
       HaskRunner
       HaskRunner.Core
       HaskRunner.Generation.Generator
       HaskRunner.Graphics.Drawers
+      HaskRunner.Graphics.GlossDrawer
       HaskRunner.ObjectsHandlers.GameObjectsHandler
       HaskRunner.ObjectsHandlers.LevelHandler
       HaskRunner.ObjectsHandlers.PlayerHandler
@@ -44,12 +45,42 @@ library
   default-extensions: DuplicateRecordFields FlexibleContexts FlexibleInstances GeneralizedNewtypeDeriving LambdaCase NamedFieldPuns ScopedTypeVariables OverloadedStrings
   ghc-options: -Wall -fno-warn-type-defaults
   build-depends:
-      algebraic-graphs
+      aeson
+    , algebraic-graphs
     , base >=4.7 && <5
+    , bytestring
     , codeworld-api
     , containers
+    , gloss
+    , gloss-rendering
+    , http-conduit
     , random
     , random-fu
+    , text
+  default-language: Haskell2010
+
+executable hask-server
+  main-is: Main.hs
+  other-modules:
+      Paths_the_hask_runner
+  hs-source-dirs:
+      server
+  default-extensions: DuplicateRecordFields FlexibleContexts FlexibleInstances GeneralizedNewtypeDeriving LambdaCase NamedFieldPuns ScopedTypeVariables OverloadedStrings
+  ghc-options: -Wall -fno-warn-type-defaults
+  build-depends:
+      aeson
+    , algebraic-graphs
+    , base >=4.7 && <5
+    , bytestring
+    , codeworld-api
+    , containers
+    , gloss
+    , gloss-rendering
+    , hedis
+    , http-conduit
+    , random
+    , random-fu
+    , scotty
     , text
   default-language: Haskell2010
 
@@ -62,12 +93,17 @@ executable the-hask-runner
   default-extensions: DuplicateRecordFields FlexibleContexts FlexibleInstances GeneralizedNewtypeDeriving LambdaCase NamedFieldPuns ScopedTypeVariables OverloadedStrings
   ghc-options: -Wall -fno-warn-type-defaults -rtsopts -threaded -with-rtsopts=-N
   build-depends:
-      algebraic-graphs
+      aeson
+    , algebraic-graphs
     , base >=4.7 && <5
+    , bytestring
     , codeworld-api
     , containers
+    , gloss
+    , gloss-rendering
+    , http-conduit
     , random
     , random-fu
-    , the-hask-runner
     , text
+    , the-hask-runner
   default-language: Haskell2010

@@ -14,8 +14,29 @@ increaseLevelVelocity dt level = level {
   where
     newVelocity = (horVelocity level) + dt * horizontalAcceleration
 
--- check, if player died; if so, update the level accordingly
-playerDeath :: Level -> Level
-playerDeath level
-    | playerDied level = level { isFinished = True }
-    | otherwise        = level
+playersDeaths :: Level -> Level
+playersDeaths level
+    | isDead __player1 && isDead __player2 = level { state = Dead "" }
+    | otherwise                            = level
+  where
+    __player1 = player1 level
+    __player2 = player2 level
+
+-- check, if player died; if so, update him accordingly
+checkPlayerDeath :: Player -> Level -> Level
+checkPlayerDeath player level
+    | playerDied level player =
+        if (player == __player1) then
+            level { player1 = killPlayer player }
+        else
+            level { player2 = killPlayer player }
+    | otherwise               = level
+  where
+    __player1 = player1 level
+    __player2 = player2 level
+
+-- launch game in one players mode
+onePlayer :: Level -> Level
+onePlayer level = level {player2 = __player2 {isDead = True, distance = 100} }
+  where
+    __player2 = player2 level
