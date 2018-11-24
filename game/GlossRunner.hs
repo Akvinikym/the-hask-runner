@@ -60,8 +60,14 @@ eventsWorld (EventKey (Char '.') Down _ _) level
 eventsWorld (EventKey (Char 'r') Down _ _) level
     | (state level) == Dead = initialWorld
     | otherwise             = level
+eventsWorld (EventKey (Char 'a') Down _ _) level
+    | (state level) == Dead = onePlayer initialWorld
+    | otherwise             = level
 eventsWorld (EventKey (Char 's') Down _ _) level
     | (state level) == MainMenu = initialWorld
+    | otherwise                 = level
+eventsWorld (EventKey (Char 'a') Down _ _) level
+    | (state level) == MainMenu = onePlayer initialWorld
     | otherwise                 = level
 eventsWorld _ level = level
 

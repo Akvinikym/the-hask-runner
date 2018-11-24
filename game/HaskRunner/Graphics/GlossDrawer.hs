@@ -17,7 +17,8 @@ drawLevel level = case (state level) of
 drawMainMenu :: Level -> Picture
 drawMainMenu _
   = translate (-400) 0 ((drawTextLine "Welcome!")
-    <> (translate 0 (-100) (drawTextLine "Press 'S' to start the game!")))
+    <> (translate (-200) (-100) (drawTextLine "Press 'S' to start the game with two-players!"))
+    <> (translate (-200) (-200) (drawTextLine "Press 'A' to start the game with one-player!")))
 
 drawTextLine :: String -> Picture
 drawTextLine text = scale 0.4 0.4 (Text text)
@@ -30,7 +31,7 @@ drawGameOverScreen level
   where
     score1 = gameScore level (player1 level)
     score2 = gameScore level (player2 level)
-    finalMessage = "Game Over! Press 'R' to restart"
+    finalMessage = "Game Over! Press 'R' or 'A' to restart"
     finalScore1 = "Final score of player 1: " ++  show score1
     finalScore2 = "Final score of player 2: " ++  show score2
 
