@@ -27,3 +27,12 @@ OR
 stack repl
 main
 ```
+
+## Running Scoreboard Server
+
+For the server you need redis listening on port 6379. To build and start a server run:
+```
+stack build && stack exec hask-server
+```
+
+The server listens on port 3000
