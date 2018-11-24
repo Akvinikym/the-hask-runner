@@ -7,23 +7,20 @@ import Data.Maybe
 import Data.List
 type Seed = Double
 
--- | TODO: take from Core
+-- | Constants
+platformHeight = 1.0
 verticalSpeed = 4
 initialSpeed = 2
 playerHeight = 2.0
 meanNumberOfWalls = 10
 minNumberOfWalls = 4
-minWallY:: Double
 minWallY = 3.5 - screenHeight 
-maxWallY :: Double
 maxWallY = screenHeight - 3.5 
-yLevels :: Int
 yLevels = 5
 meanOriginOffset = 1.5
 baseOriginOffset = 7.33
 wallBase = 7.0
 meanWallLength = 1.0
-meanNumberOfSpikes :: Int
 meanNumberOfSpikes = 5
 -- |
 
@@ -72,8 +69,6 @@ levelGenerator s = scanl getNextXOrigin (safeZone 0.0) objectsMix
         getNextXOrigin prev next =  (safeZone x) ++ [makeCoin (x + 10.0) 0.0] ++ next (x + 10.0)
             where
                 Point x _ = topRight (bounds (last prev))
-
-platformHeight = 1.0
 
 
 makeVerticalWall :: Double -> Double -> Double -> GameObject
@@ -208,7 +203,7 @@ makeGraph walls = G.buildG b edges
         getEdges (i, (inBup, inBdown)) (j, (outBup, outBdown)) | edgeExists inBup inBdown outBup outBdown = Just (i, j)
                                                                | otherwise = Nothing
 
--- TODO add check for player sizes
+                                                               
 edgeExists :: Bounds -> Bounds -> Bounds -> Bounds -> Bool
 edgeExists inUp inDown outUp outDown = fromUpToDown || fromDownToUp
     where
@@ -250,10 +245,6 @@ getHorizontalSpeed x = horizontalSpeed
                 d = b * b - 4 * a * (-c)
                 t1 = e + sqrt (d / (2 * a))
 
--- Check whether player can reach second wall from first wall
--- checkIntersection :: GameObject -> GameObject -> Bool
--- checkIntersection w w' = _
-
 -- Obtain incoming trapezoids for wall
 getIncomingTrapezoids :: GameObject -> (Bounds, Bounds)
 getIncomingTrapezoids (GameObject bound _) = (getIncomingUpperBound (topLeft bound) (topRight bound), getIncomingLowerBound (bottomLeft bound) (bottomRight bound))
@@ -277,13 +268,4 @@ getOutcomingTrapezoids (GameObject bound _) = (getOutcomingUpperBound (topLeft b
             calculateOutcomingBoundXPoint x dY = x + getHorizontalSpeed x * time + 0.5 * horizontalAcceleration * (time ^ 2)
                 where
                     time = dY / verticalSpeed
-
-
--- -- Check if graph contains feasible route from start to end
--- checkGraph :: Graph -> Bool
--- checkGraph g = _
-
--- -- Add spikes to reduce # of paths through graph or make path harder
--- backwardGraphPass :: Graph -> [GameObject]
--- backwardGraphPass g = _
 
