@@ -87,10 +87,9 @@ makeWall x y l = GameObject bounds Platform
     where
         bounds = Bounds p1 p2 p3 p4
         p1 = Point x y
-        p2 = Point (x + l) y
+        p2 = Point (x + l) y 
         p3 = Point (x + l) (y - platformHeight)
-        p4 = Point x (y - platformHeight)
-
+        p4 = Point x (y - platformHeight) 
 
 merge :: Ord a => [[a]] -> [a]
 merge  = sort . concat 
@@ -104,8 +103,7 @@ merge2 (x : xs) (x' : xs') |  x < x' = [x] ++ merge2 xs ([x'] ++ xs')
 getFeasibleRandomWalls :: Int -> Double -> [GameObject]
 getFeasibleRandomWalls s xOrigin = head $ dropWhile (not.isFeasible) (map (\s -> generateRandomWalls s xOrigin) seeds)
         where
-            g = mkStdGen s
-            seeds =  (randoms g :: [Int])
+            seeds =  (randoms (mkStdGen s) :: [Int])
 
 -- -- Randomly generate walls
 generateRandomWalls :: Int -> Double -> [GameObject]
@@ -176,6 +174,7 @@ makeCoin x y = GameObject bounds Coin
         p3 = Point (x + 0.25) (y - 0.25)
         p4 = Point x (y - 0.25)
 
+
 generateRandomSpikes :: Int -> Double -> [GameObject]
 generateRandomSpikes s xOrigin = zipWith makeSpike spikeXOrigins spikeYOrigins
         where
@@ -204,7 +203,6 @@ makeGraph walls = G.buildG b edges
         getEdges :: (Int, (Bounds, Bounds)) -> (Int, (Bounds, Bounds)) -> Maybe (Int, Int)
         getEdges (i, (inBup, inBdown)) (j, (outBup, outBdown)) | edgeExists inBup inBdown outBup outBdown = Just (i, j)
                                                                | otherwise = Nothing
-
                                                                
 edgeExists :: Bounds -> Bounds -> Bounds -> Bounds -> Bool
 edgeExists inUp inDown outUp outDown = fromUpToDown || fromDownToUp
