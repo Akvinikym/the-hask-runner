@@ -8,7 +8,7 @@ import Data.List
 type Seed = Double
 
 -- | Constants
-platformHeight = 1.0
+platformHeight = 0.8
 verticalSpeed = 4
 initialSpeed = 2
 playerHeight = 2.0
