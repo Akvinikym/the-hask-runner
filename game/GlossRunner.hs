@@ -41,14 +41,14 @@ initialWorld
         (Point (-0.5) 2)
         (Point 0.5 2)
         (Point 0.5 (1))
-        (Point (-0.5) (2))) 0 0 True 0 0 False
+        (Point (-0.5) (1))) 0 0 True 0 0 False
 
     initialPlayer2 = Player "Player 2"
       (Bounds
-        (Point (-1) (-1))
-        (Point 1 (-1))
-        (Point 1 (-3))
-        (Point (-1) (-3))) 0 0 True 0 0 False
+        (Point (-0.5) (-1))
+        (Point 0.5 (-1))
+        (Point 0.5 (-2))
+        (Point (-0.5) (-2))) 0 0 True 0 0 False
 
 eventsWorldIO :: Event -> Level -> IO Level
 eventsWorldIO event level

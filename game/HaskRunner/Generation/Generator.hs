@@ -16,14 +16,17 @@ meanNumberOfWalls = 10
 minNumberOfWalls = 4
 minWallY = 3.5 - screenHeight 
 maxWallY = screenHeight - 3.5 
-yLevels :: Int
-yLevels = 5
-meanOriginOffset = 1.5
-baseOriginOffset = 7.33
+varOffsetX = 1.5
+meanOffsetX = 7.33
 wallBase = 7.0
 meanWallLength = 1.0
+
+
 meanNumberOfSpikes :: Int
 meanNumberOfSpikes = 5
+yLevels :: Int
+yLevels = 5
+
 -- |
 
 -- Helper function for phi_inverse
@@ -64,12 +67,12 @@ levelGenerator s = scanl getNextXOrigin (safeZone 0.0) doors
         spikes = map generateRandomSpikes seedRvs  
         verticalWalls = map generateRandomVerticalWalls seedRvs 
         doors = map generateRandomDoors seedRvs
-
-        -- zippedBatches = zip4 verticalWalls walls spikes doors
-        -- objectsMix = map (\ (x1, x2, x3, x4) t -> merge [(x1 t), (x2 t), (x3 t), (x4 t)]) zippedBatches
-        objectsMix = map (\ (x1, x2) t -> merge [(x1 t), (x2 t)]) (zip walls doors)
-
-        getNextXOrigin prev next =  (safeZone x) ++ [makeCoin (x + 10.0) 0.0] ++ next (x + 10.0)
+        coins = map generateRandomCoins seedRvs
+        zippedBatches = zip5 verticalWalls walls spikes doors coins
+        objectsMix = map (\ (x1, x2, x3, x4, x5) t ->
+                        merge [(x1 t), (x2 t), (x3 t), (x4 t), (x5 t)]) 
+                            zippedBatches
+        getNextXOrigin prev next =  (safeZone x) ++ next (x + 10.0)
             where
                 Point x _ = topRight (bounds (last prev))
 
@@ -102,53 +105,85 @@ merge2 (x : xs) (x' : xs') |  x < x' = [x] ++ merge2 xs ([x'] ++ xs')
                            | otherwise = [x'] ++ merge2 ([x] ++ xs) xs'
 
 getFeasibleRandomWalls :: Int -> Double -> [GameObject]
-getFeasibleRandomWalls s xOrigin = head $ dropWhile (not.isFeasible) (map (\s -> generateRandomWalls s xOrigin) seeds)
+getFeasibleRandomWalls s xOrigin = head $ dropWhile (not.isFeasible) 
+                            (map (\s -> generateRandomWalls s xOrigin) seeds)
         where
             seeds =  (randoms (mkStdGen s) :: [Int])
 
--- -- Randomly generate walls
+
+
+-- Randomly generate coins
+generateRandomCoins :: Int -> Double -> [GameObject]
+generateRandomCoins s xOrigin = zipWith makeCoin coinX coinY -- -- Randomly generate walls
+            where
+                meanCoins = 10
+                varCoins = 2
+                minCoins = 4
+
+                normalRvs = map phi_inverse (randomRs (0.0, 1.0) (mkStdGen s))
+                uniformRvs = randomRs (0, yLevels + 1) (mkStdGen s)
+                numberOfCoins = round (min (meanCoins + varCoins * (head normalRvs)) minCoins)
+                coinY = map (\x -> ( (fromIntegral(x) / fromIntegral(yLevels)) * (maxWallY - minWallY) + minWallY)) (take numberOfCoins uniformRvs)
+                coinX = scanl (+) xOrigin (map (\x -> meanOffsetX + varOffsetX * x) (take numberOfCoins normalRvs))
+
+
+
+-- Randomly generate coins
 generateRandomWalls :: Int -> Double -> [GameObject]
-generateRandomWalls s xOrigin = zipWith3 makeWall platformXOrigins platformYOrigins platformLenghts
+generateRandomWalls s xOrigin = zipWith3 makeWall 
+                            platformXOrigins platformYOrigins platformLenghts
         where
             normalRvs = map phi_inverse (randomRs (0.0, 1.0) (mkStdGen s))
             uniformRvs = randomRs (0, yLevels) (mkStdGen s)
             numberOfWalls = round (min (meanNumberOfWalls + meanNumberOfWalls * (head normalRvs)) minNumberOfWalls)
             platformLenghts = map (\x -> x * meanWallLength + wallBase) (take numberOfWalls normalRvs)
             platformYOrigins = map (\x -> ( (fromIntegral(x) / fromIntegral(yLevels)) * (maxWallY - minWallY) + minWallY)) (take numberOfWalls uniformRvs)
-            platformXOrigins = scanl (+) xOrigin (map (\x -> baseOriginOffset + meanOriginOffset * x) (take numberOfWalls normalRvs))
+            platformXOrigins = scanl (+) xOrigin (map (\x -> meanOffsetX + varOffsetX * x) (take numberOfWalls normalRvs))
 
 generateRandomVerticalWalls :: Int -> Double -> [GameObject]
 generateRandomVerticalWalls s xOrigin = zipWith3 makeVerticalWall platformXOrigins platformYOrigins platformLenghts
         where
-            normalRvs = map phi_inverse (randomRs (0.0, 1.0) (mkStdGen s))
+            normalRvs = map phi_inverse (drop 20 (randomRs (0.0, 1.0) (mkStdGen s)))
             numberOfWalls = round (min (head normalRvs) 1)
-            platformLenghts = map (\x -> x * meanWallLength + wallBase) (take numberOfWalls normalRvs)
+            platformLenghts = map (\x -> x * meanWallLength + wallBase)
+                                 (take numberOfWalls normalRvs)
             platformYOrigins =  take numberOfWalls [0.0, 0.0 ..]
-            platformXOrigins = scanl (+) xOrigin (map (\x -> baseOriginOffset + meanOriginOffset * x) (take numberOfWalls normalRvs))
+            platformXOrigins = scanl (+) xOrigin (map (\x -> meanOffsetX + varOffsetX * x)
+                                                 (take numberOfWalls normalRvs))
 
 generateRandomDoors :: Int -> Double -> [GameObject]
-generateRandomDoors s xOrigin = result numberOfDoors
+generateRandomDoors s xOrigin = concat (zipWith3 makeDoorButtonPair doorXOrigins buttonYOrigins doorButtonOffset)
         where
-            normalRvs = map phi_inverse (randomRs (0.0, 1.0) (mkStdGen s))
-            numberOfDoors = 1 * (fromEnum ((head normalRvs) > -1.0))
-            doorY =  -1
-            doorX = xOrigin + 10.0
-            result 1 = makeDoorButtonPair doorX doorY
-            result _= []
+            baseDoorY = 0
+            varDoorY = 1
+            baseDoorOffset = 10
+            varDoorOffset = 0.1
+
+            uniformRvs = randomRs (0.0, 1.0) (mkStdGen s)
+            normalRvs = map phi_inverse uniformRvs
+            -- numberOfDoors = 1 * (fromEnum ((head normalRvs) > 1.2)) -- 11 % chance to get a door 
+            numberOfDoors = 1 * (fromEnum ((head uniformRvs) > 0.5)) -- 50 % chance to get a door 
+
+            buttonYOrigins =  map (\x -> baseDoorY + varDoorY * x) (take numberOfDoors normalRvs)
+            doorButtonOffset = map (\x -> baseDoorOffset) (take numberOfDoors normalRvs)
+            doorXOrigins = scanl (+) xOrigin (map (\x -> meanOffsetX + varOffsetX * x) (take numberOfDoors normalRvs))
 
 
-makeDoorButtonPair :: Double -> Double -> [GameObject]
-makeDoorButtonPair x y = [makeDoor x, makeButton x y]
+makeDoorButtonPair :: 
+    Double -> -- X origin of the button
+    Double -> -- Y level of the button
+    Double -> -- Distance between door and button
+    [GameObject]
+makeDoorButtonPair x y d = [makeDoor x d, makeButton x y]
 
-makeDoor :: Double -> GameObject
-makeDoor x = GameObject bounds (Door x)
+makeDoor :: Double -> Double -> GameObject
+makeDoor x d = GameObject bounds (Door x)
     where
-        doorOffset = 10.0
         bounds = Bounds p1 p2 p3 p4
-        p1 = Point (x + doorOffset) screenHeight
-        p2 = Point (x + doorOffset + 1.5) screenHeight
-        p3 = Point (x + doorOffset + 1.5) ( - screenHeight)
-        p4 = Point (x + doorOffset) ( - screenHeight)
+        p1 = Point (x + d) screenHeight
+        p2 = Point (x + d + 1.5) screenHeight
+        p3 = Point (x + d + 1.5) ( - screenHeight)
+        p4 = Point (x + d) ( - screenHeight)
 
 makeButton :: Double -> Double -> GameObject
 makeButton x y = GameObject bounds (Button x)

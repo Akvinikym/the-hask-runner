@@ -123,15 +123,22 @@ checkButtons player level = level { doorsOpened = __openedDoors, levelMap = lmap
       lmap = deleteBy buttonCollision undefined (levelMap level)
       buttonsCollided = filter (buttonCollision undefined) objectsOnScreen
       __openedDoors = (doorsOpened level) ++ (catMaybes (map getButtonId buttonsCollided))
+      
+    
       getButtonId :: GameObject -> Maybe Double
-      getButtonId (GameObject b (Button id)) =  Just id
+      getButtonId (GameObject _ (Button id)) =  Just id
       getButtonId _ = Nothing
+      
+      -- Has player collided with the any button
       buttonCollision :: a -> GameObject -> Bool
       buttonCollision _ (GameObject b (Button _)) = collided absPos b
       buttonCollision _ _ = False
+
       objectsOnScreen
           = takeWhile (onScreen level)
             (dropWhile (not . (onScreen level)) (levelMap level))
+
       playerBounds = pbounds player
       currentAbsPos = absolutePosition (levelPos level) playerBounds
       absPos = moveBounds currentAbsPos (horizontalAcceleration, pVertVelocity player)
+    

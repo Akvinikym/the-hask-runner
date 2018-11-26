@@ -13,7 +13,7 @@ screenWidth = 20
 
 -- value by which vertical speed is adjusted
 baseGravity :: Double
-baseGravity = (-0.3)
+baseGravity = (-0.35)
 
 -- how fast the level accelerates
 horizontalAcceleration :: Double
