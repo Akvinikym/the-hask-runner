@@ -29,19 +29,19 @@ initialWorld
     = Level
         initialPlayer1
         initialPlayer2
-        (objectGenerator 42353)
+        (objectGenerator 4153)
         levelEdges
-        100
+        0
         Playing
         0.1
         []
   where
     initialPlayer1 = Player "Player 1"
       (Bounds
-        (Point (-1) 3)
-        (Point 1 3)
-        (Point 1 (1))
-        (Point (-1) (1))) 0 0 True 0 0 False
+        (Point (-0.5) 2)
+        (Point 0.5 2)
+        (Point 0.5 (1))
+        (Point (-0.5) (2))) 0 0 True 0 0 False
 
     initialPlayer2 = Player "Player 2"
       (Bounds

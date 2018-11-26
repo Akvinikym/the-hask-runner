@@ -57,7 +57,7 @@ safeZone xOrigin = [ GameObject (Bounds
 
 -- Infinite list of gameObj batches
 levelGenerator :: Int -> [[GameObject]]
-levelGenerator s = scanl getNextXOrigin (safeZone 0.0) objectsMix
+levelGenerator s = scanl getNextXOrigin (safeZone 0.0) doors
     where
         seedRvs =  (randoms (mkStdGen s) :: [Int])
         walls = map generateRandomWalls seedRvs 
@@ -65,8 +65,10 @@ levelGenerator s = scanl getNextXOrigin (safeZone 0.0) objectsMix
         verticalWalls = map generateRandomVerticalWalls seedRvs 
         doors = map generateRandomDoors seedRvs
 
-        zippedBatches = zip4 verticalWalls walls spikes doors
-        objectsMix = map (\ (x1, x2, x3, x4) t -> merge [(x1 t), (x2 t), (x3 t), (x4 t)]) zippedBatches
+        -- zippedBatches = zip4 verticalWalls walls spikes doors
+        -- objectsMix = map (\ (x1, x2, x3, x4) t -> merge [(x1 t), (x2 t), (x3 t), (x4 t)]) zippedBatches
+        objectsMix = map (\ (x1, x2) t -> merge [(x1 t), (x2 t)]) (zip walls doors)
+
         getNextXOrigin prev next =  (safeZone x) ++ [makeCoin (x + 10.0) 0.0] ++ next (x + 10.0)
             where
                 Point x _ = topRight (bounds (last prev))
@@ -125,12 +127,14 @@ generateRandomVerticalWalls s xOrigin = zipWith3 makeVerticalWall platformXOrigi
             platformXOrigins = scanl (+) xOrigin (map (\x -> baseOriginOffset + meanOriginOffset * x) (take numberOfWalls normalRvs))
 
 generateRandomDoors :: Int -> Double -> [GameObject]
-generateRandomDoors s xOrigin = concat (zipWith makeDoorButtonPair platformXOrigins platformYOrigins)
+generateRandomDoors s xOrigin = result numberOfDoors
         where
             normalRvs = map phi_inverse (randomRs (0.0, 1.0) (mkStdGen s))
-            numberOfDoors = 1 * (fromEnum ((head normalRvs) > 1.2)) -- 11 % chance to get a door 
-            platformYOrigins =  take numberOfDoors [-1.0, -1.0 ..]
-            platformXOrigins = scanl (+) xOrigin (map (\x -> baseOriginOffset + meanOriginOffset * x) (take numberOfDoors normalRvs))
+            numberOfDoors = 1 * (fromEnum ((head normalRvs) > -1.0))
+            doorY =  -1
+            doorX = xOrigin + 10.0
+            result 1 = makeDoorButtonPair doorX doorY
+            result _= []
 
 
 makeDoorButtonPair :: Double -> Double -> [GameObject]

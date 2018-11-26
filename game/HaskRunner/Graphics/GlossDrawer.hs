@@ -6,7 +6,7 @@ import HaskRunner.Core
 
 -- How much to scale the picture
 scaleFactor :: Float
-scaleFactor = 25
+scaleFactor = 15
 
 drawLevel :: Level -> Picture
 drawLevel level = case (state level) of

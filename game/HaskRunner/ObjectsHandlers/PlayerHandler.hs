@@ -43,8 +43,12 @@ movePlayer dt player level
       (hor, vert)
 
       where
+        isPassable (GameObject _ (Button _)) = False
+        isPassable (GameObject _ Coin) = False
+        isPassable _ = True
+
         objectOnScreenWithoutCoins
-            = filter ((/= Coin) . objectType) (objectsOnScreen level)
+            = filter isPassable (objectsOnScreen level)
 
 -- find out, if the player dies, collided with some obstacle
 playerDied :: Level -> Player -> Bool

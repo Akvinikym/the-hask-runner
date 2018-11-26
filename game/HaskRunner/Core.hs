@@ -17,7 +17,7 @@ baseGravity = (-0.3)
 
 -- how fast the level accelerates
 horizontalAcceleration :: Double
-horizontalAcceleration = 0.02
+horizontalAcceleration = 0.01
 
 -- current level state; main state of the world as well
 data Level = Level
